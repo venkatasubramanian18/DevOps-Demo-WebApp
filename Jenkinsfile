@@ -53,8 +53,8 @@ pipeline {
 			    spec: '''{
 				  "files": [
 				    {
-				      "pattern": "AVNCommunication-1.0.pom",
-				      "target": "/var/lib/jenkins/.m2/repository/WEBPOC/AVNCommunication/1.0/AVNCommunication-1.0.pom"
+				      "pattern": "/var/lib/jenkins/.m2/repository/WEBPOC/AVNCommunication/1.0/AVNCommunication-1.0.war",
+				      "target": "libs-release-local/"
 				    }
 				 ]
 			    }'''
