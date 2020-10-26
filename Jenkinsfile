@@ -47,16 +47,16 @@ pipeline {
 //	}
 	stage('Build - Maven') {
 		steps {
-//			sh 'mvn clean install'
-			rtMavenRun (
-			    // Tool name from Jenkins configuration.
-			    tool: 'maven',
-			    pom: 'pom.xml',
-			    goals: '-U clean install -e',
-			    // Maven options.
-			    opts: '-Xms1024m -Xmx4096m',
-			    resolverId: 'resolver-artifactory',
-			    deployerId: 'deployer-artifactory'
+			sh 'mvn clean install'
+//			rtMavenRun (
+//			    // Tool name from Jenkins configuration.
+//			    tool: 'maven',
+//			    pom: 'pom.xml',
+//			    goals: '-U clean install -e',
+//			    // Maven options.
+//			    opts: '-Xms1024m -Xmx4096m',
+//			    resolverId: 'resolver-artifactory',
+//			    deployerId: 'deployer-artifactory'
 //			    // If the build name and build number are not set here, the current job name and number will be used:
 			)
 			slackSend channel: '#devops', tokenCredentialId: 'slacktoken', message: "Build - Maven ${env.JOB_NAME} ${env.BUILD_NUMBER}"
@@ -70,23 +70,23 @@ pipeline {
 //		}
 //   	}	    	    
 				
-//    	stage('Deploy to Test') {
-//		steps{
-//			script {
-//				deploy adapters: [tomcat8(credentialsId: 'tomcat', path: '', url: 'http://23.101.207.158:8080/')], contextPath: '/QAWebapp', war: '**/*.war'	
-//				slackSend channel: '#devops', tokenCredentialId: 'slacktoken', message: "Deploy to Test ${env.JOB_NAME} ${env.BUILD_NUMBER}"					
-//			}
-//		}
-//   	}	
-//	stage('Perform UI Test - Publish Report') {
-//		steps{
-//			script {
-//			  sh 'mvn -f functionaltest/pom.xml package'
-//			  sh 'mvn package test'
-//			  publishHTML([allowMissing: false, alwaysLinkToLastBuild: false, keepAll: false, reportDir: '\\functionaltest\\target\\surefire-reports', reportFiles: 'index.html', reportName: 'UI Test Report', reportTitles: ''])
-//			}
-//		}
-//  	}
+    	stage('Deploy to Test') {
+		steps{
+			script {
+				deploy adapters: [tomcat8(credentialsId: 'tomcat', path: '', url: 'http://23.101.207.158:8080/')], contextPath: '/QAWebapp', war: '**/*.war'	
+				slackSend channel: '#devops', tokenCredentialId: 'slacktoken', message: "Deploy to Test ${env.JOB_NAME} ${env.BUILD_NUMBER}"					
+			}
+		}
+   	}	
+	stage('Perform UI Test - Publish Report') {
+		steps{
+			script {
+			  sh 'mvn -f functionaltest/pom.xml package'
+			  sh 'mvn package test'
+			  publishHTML([allowMissing: false, alwaysLinkToLastBuild: false, keepAll: false, reportDir: '\\functionaltest\\target\\surefire-reports', reportFiles: 'index.html', reportName: 'UI Test Report', reportTitles: ''])
+			}
+		}
+  	}
 	    
 //	stage('Performance Test - Blazemeter') {
 //		steps{
@@ -95,23 +95,23 @@ pipeline {
 //		}
 //	}	  
 
-//	stage('Deploy to Prod') {
-//		steps{
-//	     		deploy adapters: [tomcat8(credentialsId: 'tomcat', path: '', url: 'http://51.141.177.121:8080/')], contextPath: '/ProdWebapp', war: '**/*.war'	
-//			slackSend channel: '#devops', tokenCredentialId: 'slacktoken', message: "Deploy to Prod ${env.JOB_NAME} ${env.BUILD_NUMBER}"	    
-//		}
-//	}	
+	stage('Deploy to Prod') {
+		steps{
+	     		deploy adapters: [tomcat8(credentialsId: 'tomcat', path: '', url: 'http://51.141.177.121:8080/')], contextPath: '/ProdWebapp', war: '**/*.war'	
+			slackSend channel: '#devops', tokenCredentialId: 'slacktoken', message: "Deploy to Prod ${env.JOB_NAME} ${env.BUILD_NUMBER}"	    
+		}
+	}	
 	    
-//	stage('Perform Sanity Test - Publish Report') {
-//		steps{
-//			script {
-//			     sh 'mvn -f Acceptancetest/pom.xml package'
-//			     sh 'mvn package test'
-//			     publishHTML([allowMissing: false, alwaysLinkToLastBuild: false, keepAll: false, reportDir: '\\Acceptancetest\\target\\surefire-reports', reportFiles: 'index.html', reportName: 'Sanity Test Report', reportTitles: ''])
-//			     slackSend channel: '#devops', tokenCredentialId: 'slacktoken', message: "Perform Sanity Test - Publish Report ${env.JOB_NAME} ${env.BUILD_NUMBER}"
-//			}
-//		}
-//	 }	 	    
+	stage('Perform Sanity Test - Publish Report') {
+		steps{
+			script {
+			     sh 'mvn -f Acceptancetest/pom.xml package'
+			     sh 'mvn package test'
+			     publishHTML([allowMissing: false, alwaysLinkToLastBuild: false, keepAll: false, reportDir: '\\Acceptancetest\\target\\surefire-reports', reportFiles: 'index.html', reportName: 'Sanity Test Report', reportTitles: ''])
+			     slackSend channel: '#devops', tokenCredentialId: 'slacktoken', message: "Perform Sanity Test - Publish Report ${env.JOB_NAME} ${env.BUILD_NUMBER}"
+			}
+		}
+	 }	 	    
     }
     post {
 	success {
