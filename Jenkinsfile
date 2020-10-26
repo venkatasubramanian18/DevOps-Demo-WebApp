@@ -36,7 +36,7 @@ pipeline {
             steps {
                 // Get some code from a GitHub repository
                 git credentialsId: 'github', url: 'git@github.com:venkatasubramanian18/DevOps-Demo-WebApp.git'
-		slackSend channel: 'devops', message: "started ${env.JOB_NAME} ${env.BUILD_NUMBER} (<${env.BUILD_URL}|Open>)", tokenCredentialId: 'slack'
+		slackSend channel: 'devops', message: "started ${env.JOB_NAME} ${env.BUILD_NUMBER} (<${env.BUILD_URL}|Open>)", tokenCredentialId: 'slacktoken'
             }
         }
 //       stage('Code Analysis - SonarQube') {
