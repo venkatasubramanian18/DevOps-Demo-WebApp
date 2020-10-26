@@ -45,9 +45,9 @@ pipeline {
 //			}
 //		}
 //	}
-//	stage('Build - Maven') {
-//		steps {
-//			sh 'mvn clean install'
+	stage('Build - Maven') {
+		steps {
+			sh 'mvn clean install'
 //			rtMavenRun (
 //			    // Tool name from Jenkins configuration.
 //			    tool: 'maven',
@@ -58,10 +58,10 @@ pipeline {
 //			    resolverId: 'resolver-artifactory',
 //			    deployerId: 'deployer-artifactory'
 //			    // If the build name and build number are not set here, the current job name and number will be used:
-//			)
-//			slackSend channel: '#devops', tokenCredentialId: 'slacktoken', message: "Build - Maven ${env.JOB_NAME} ${env.BUILD_NUMBER}"
-//		}
-//   	}
+			)
+			slackSend channel: '#devops', tokenCredentialId: 'slacktoken', message: "Build - Maven ${env.JOB_NAME} ${env.BUILD_NUMBER}"
+		}
+   	}
 //     	stage('Store the Artifacts') {
 //		steps {
 //			rtPublishBuildInfo (
