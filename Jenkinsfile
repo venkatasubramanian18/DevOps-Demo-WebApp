@@ -6,10 +6,10 @@ pipeline {
        maven 'maven'
     }
 	
-    stages {
-	slackSend channel: '#devops', tokenCredentialId: 'slacktoken', message: "started ${env.JOB_NAME} ${env.BUILD_NUMBER} (<${env.BUILD_URL}|Open>)"
+    stages {	
         stage ('Artifactory configuration') {
             steps {
+		slackSend channel: '#devops', tokenCredentialId: 'slacktoken', message: "started ${env.JOB_NAME} ${env.BUILD_NUMBER} (<${env.BUILD_URL}|Open>)"
                 rtServer (
                     id: 'Artifactory',
                     url: 'https://ansibledevops.jfrog.io/artifactory',
