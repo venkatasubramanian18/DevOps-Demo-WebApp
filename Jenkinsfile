@@ -59,7 +59,7 @@ pipeline {
 //			    deployerId: 'deployer-artifactory'
 //			    // If the build name and build number are not set here, the current job name and number will be used:
 //			)
-			slackSend channel: '#devops', tokenCredentialId: 'slacktoken', message: "Build - Maven ${env.JOB_NAME} ${env.BUILD_NUMBER}"
+			slackSend channel: '#devops', tokenCredentialId: 'slacktoken', message: "Build Success ${env.JOB_NAME} ${env.BUILD_NUMBER}"
 		}
    	}
 //     	stage('Store the Artifacts') {
@@ -74,7 +74,7 @@ pipeline {
 		steps{
 			script {
 				deploy adapters: [tomcat8(credentialsId: 'tomcat', path: '', url: 'http://23.101.207.158:8080/')], contextPath: '/QAWebapp', war: '**/*.war'	
-				slackSend channel: '#devops', tokenCredentialId: 'slacktoken', message: "Deploy to Test ${env.JOB_NAME} ${env.BUILD_NUMBER}"					
+				slackSend channel: '#devops', tokenCredentialId: 'slacktoken', message: "Deployed to Test ${env.JOB_NAME} ${env.BUILD_NUMBER}"					
 			}
 			jiraSendDeploymentInfo environmentId: 'Test', environmentName: 'QA Test', environmentType: 'testing', serviceIds: ['http://23.101.207.158/QAWebapp/'], site: 'jira-devops18.atlassian.net', state: 'successful'
 		}
@@ -99,7 +99,7 @@ pipeline {
 	stage('Deploy to Prod') {
 		steps{
 	     		deploy adapters: [tomcat8(credentialsId: 'tomcat', path: '', url: 'http://51.141.177.121:8080/')], contextPath: '/ProdWebapp', war: '**/*.war'	
-			slackSend channel: '#devops', tokenCredentialId: 'slacktoken', message: "Deploy to Prod ${env.JOB_NAME} ${env.BUILD_NUMBER}"	    
+			slackSend channel: '#devops', tokenCredentialId: 'slacktoken', message: "Deployed to Prod ${env.JOB_NAME} ${env.BUILD_NUMBER}"	    
 		}
 	}	
 	    
