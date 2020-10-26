@@ -35,7 +35,7 @@ pipeline {
         stage('SCM - GIT Commit') {
             steps {
                 // Get some code from a GitHub repository
-                git credentialsId: 'GIT', url: 'https://github.com/venkatasubramanian18/DevOps-Demo-WebApp.git'
+                git credentialsId: 'github', url: 'git@github.com:venkatasubramanian18/DevOps-Demo-WebApp.git'
             }
         }
        stage('Code Analysis - SonarQube') {
