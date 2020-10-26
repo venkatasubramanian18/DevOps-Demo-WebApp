@@ -76,7 +76,7 @@ pipeline {
 				deploy adapters: [tomcat8(credentialsId: 'tomcat', path: '', url: 'http://23.101.207.158:8080/')], contextPath: '/QAWebapp', war: '**/*.war'	
 				slackSend channel: '#devops', tokenCredentialId: 'slacktoken', message: "Deployed to Test ${env.JOB_NAME} ${env.BUILD_NUMBER}"					
 			}
-			jiraSendDeploymentInfo environmentId: 'Test', environmentName: 'QA Test', environmentType: 'testing', serviceIds: ['http://23.101.207.158/QAWebapp/'], site: 'jira-devops18.atlassian.net', state: 'successful'
+			jiraSendDeploymentInfo environmentId: 'Test', environmentName: 'QA Test', environmentType: 'testing', serviceIds: ['http://23.101.207.158:8080/QAWebapp/'], site: 'jira-devops18.atlassian.net', state: 'successful'
 		}
    	}	
 //	stage('Perform UI Test - Publish Report') {
