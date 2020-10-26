@@ -53,8 +53,8 @@ pipeline {
 			    spec: '''{
 				  "files": [
 				    {
-				      "pattern": "/var/lib/jenkins/workspace/devops-pipeline/",
-				      "target": "/var/lib/jenkins/workspace/devops-pipeline/target/"
+				      "pattern": "/var/lib/jenkins/.m2/repository/WEBPOC/AVNCommunication/1.0/",
+				      "target": "/var/lib/jenkins/.m2/repository/WEBPOC/AVNCommunication/1.0/AVNCommunication-1.0.pom"
 				    }
 				 ]
 			    }'''
