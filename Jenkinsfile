@@ -49,6 +49,7 @@ pipeline {
 		steps {
 			sh 'mvn clean install'
 			rtUpload (
+			    serverId: 'Artifactory',
 			    spec: '''{
 				  "files": [
 				    {
