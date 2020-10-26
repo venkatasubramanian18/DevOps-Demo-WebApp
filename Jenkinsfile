@@ -58,7 +58,7 @@ pipeline {
 			    resolverId: 'resolver-artifactory',
 			    deployerId: 'deployer-artifactory'
 //			    // If the build name and build number are not set here, the current job name and number will be used:
-//			)
+			)
 		}
     	}
 //     	stage('Store the Artifacts') {
