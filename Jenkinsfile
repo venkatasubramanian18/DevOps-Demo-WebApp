@@ -7,7 +7,7 @@ pipeline {
     }
 	
     stages {
-	    
+	slackSend channel: '#devops', tokenCredentialId: 'slacktoken', message: "started ${env.JOB_NAME} ${env.BUILD_NUMBER} (<${env.BUILD_URL}|Open>)"
         stage ('Artifactory configuration') {
             steps {
                 rtServer (
@@ -35,8 +35,7 @@ pipeline {
         stage('SCM - GIT Commit') {
             steps {
                 // Get some code from a GitHub repository
-                git credentialsId: 'github', url: 'git@github.com:venkatasubramanian18/DevOps-Demo-WebApp.git'		
-		slackSend channel: '#devops', tokenCredentialId: 'slacktoken', message: "started ${env.JOB_NAME} ${env.BUILD_NUMBER} (<${env.BUILD_URL}|Open>)"
+                git credentialsId: 'github', url: 'git@github.com:venkatasubramanian18/DevOps-Demo-WebApp.git'				
             }
         }
 //       stage('Code Analysis - SonarQube') {
@@ -60,6 +59,7 @@ pipeline {
 			    deployerId: 'deployer-artifactory'
 //			    // If the build name and build number are not set here, the current job name and number will be used:
 			)
+			slackSend channel: '#devops', tokenCredentialId: 'slacktoken', message: "Build - Maven ${env.JOB_NAME} ${env.BUILD_NUMBER}"
 		}
     	}
 //     	stage('Store the Artifacts') {
@@ -73,7 +73,8 @@ pipeline {
 //    	stage('Deploy to Test') {
 //		steps{
 //			script {
-//				deploy adapters: [tomcat8(credentialsId: 'tomcat', path: '', url: 'http://23.101.207.158:8080/')], contextPath: '/QAWebapp', war: '**/*.war'				
+//				deploy adapters: [tomcat8(credentialsId: 'tomcat', path: '', url: 'http://23.101.207.158:8080/')], contextPath: '/QAWebapp', war: '**/*.war'	
+//				slackSend channel: '#devops', tokenCredentialId: 'slacktoken', message: "Deploy to Test ${env.JOB_NAME} ${env.BUILD_NUMBER}"					
 //			}
 //		}
 //   	}	
@@ -90,12 +91,14 @@ pipeline {
 //	stage('Performance Test - Blazemeter') {
 //		steps{
 //	   		blazeMeterTest credentialsId: 'Blazemeter', testId: '8626535.taurus', workspaceId: '677291'
+//	    		slackSend channel: '#devops', tokenCredentialId: 'slacktoken', message: "Performance Test - Blazemeter ${env.JOB_NAME} ${env.BUILD_NUMBER}"
 //		}
 //	}	  
 
 //	stage('Deploy to Prod') {
 //		steps{
-//	     		deploy adapters: [tomcat8(credentialsId: 'tomcat', path: '', url: 'http://51.141.177.121:8080/')], contextPath: '/ProdWebapp', war: '**/*.war'		
+//	     		deploy adapters: [tomcat8(credentialsId: 'tomcat', path: '', url: 'http://51.141.177.121:8080/')], contextPath: '/ProdWebapp', war: '**/*.war'	
+//			slackSend channel: '#devops', tokenCredentialId: 'slacktoken', message: "Deploy to Prod ${env.JOB_NAME} ${env.BUILD_NUMBER}"	    
 //		}
 //	}	
 	    
@@ -105,6 +108,7 @@ pipeline {
 //			     sh 'mvn -f Acceptancetest/pom.xml package'
 //			     sh 'mvn package test'
 //			     publishHTML([allowMissing: false, alwaysLinkToLastBuild: false, keepAll: false, reportDir: '\\Acceptancetest\\target\\surefire-reports', reportFiles: 'index.html', reportName: 'Sanity Test Report', reportTitles: ''])
+//			     slackSend channel: '#devops', tokenCredentialId: 'slacktoken', message: "Perform Sanity Test - Publish Report ${env.JOB_NAME} ${env.BUILD_NUMBER}"
 //			}
 //		}
 //	 }	 	    
