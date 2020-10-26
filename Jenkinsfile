@@ -76,17 +76,18 @@ pipeline {
 				deploy adapters: [tomcat8(credentialsId: 'tomcat', path: '', url: 'http://23.101.207.158:8080/')], contextPath: '/QAWebapp', war: '**/*.war'	
 				slackSend channel: '#devops', tokenCredentialId: 'slacktoken', message: "Deploy to Test ${env.JOB_NAME} ${env.BUILD_NUMBER}"					
 			}
+			jiraSendDeploymentInfo environmentId: 'Test', environmentName: 'QA Test', environmentType: 'testing', serviceIds: ['http://23.101.207.158/QAWebapp/'], site: 'jira-devops18.atlassian.net', state: 'successful'
 		}
    	}	
-	stage('Perform UI Test - Publish Report') {
-		steps{
-			script {
-			  sh 'mvn -f functionaltest/pom.xml package'
-			  sh 'mvn package test'
-			  publishHTML([allowMissing: false, alwaysLinkToLastBuild: false, keepAll: false, reportDir: '\\functionaltest\\target\\surefire-reports', reportFiles: 'index.html', reportName: 'UI Test Report', reportTitles: ''])
-			}
-		}
-  	}
+//	stage('Perform UI Test - Publish Report') {
+//		steps{
+//			script {
+//			  sh 'mvn -f functionaltest/pom.xml package'
+//			  sh 'mvn package test'
+//			  publishHTML([allowMissing: false, alwaysLinkToLastBuild: false, keepAll: false, reportDir: '\\functionaltest\\target\\surefire-reports', reportFiles: 'index.html', reportName: 'UI Test Report', reportTitles: ''])
+//			}
+//		}
+//	}
 	    
 //	stage('Performance Test - Blazemeter') {
 //		steps{
@@ -102,16 +103,16 @@ pipeline {
 		}
 	}	
 	    
-	stage('Perform Sanity Test - Publish Report') {
-		steps{
-			script {
-			     sh 'mvn -f Acceptancetest/pom.xml package'
-			     sh 'mvn package test'
-			     publishHTML([allowMissing: false, alwaysLinkToLastBuild: false, keepAll: false, reportDir: '\\Acceptancetest\\target\\surefire-reports', reportFiles: 'index.html', reportName: 'Sanity Test Report', reportTitles: ''])
-			     slackSend channel: '#devops', tokenCredentialId: 'slacktoken', message: "Perform Sanity Test - Publish Report ${env.JOB_NAME} ${env.BUILD_NUMBER}"
-			}
-		}
-	 }	 	    
+//	stage('Perform Sanity Test - Publish Report') {
+//		steps{
+//			script {
+//			     sh 'mvn -f Acceptancetest/pom.xml package'
+//			     sh 'mvn package test'
+//			     publishHTML([allowMissing: false, alwaysLinkToLastBuild: false, keepAll: false, reportDir: '\\Acceptancetest\\target\\surefire-reports', reportFiles: 'index.html', reportName: 'Sanity Test Report', reportTitles: ''])
+//			     slackSend channel: '#devops', tokenCredentialId: 'slacktoken', message: "Perform Sanity Test - Publish Report ${env.JOB_NAME} ${env.BUILD_NUMBER}"
+//			}
+//		}
+//	 }	 	    
     }
     post {
 	success {
