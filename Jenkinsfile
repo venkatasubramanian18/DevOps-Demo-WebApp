@@ -48,7 +48,16 @@ pipeline {
 	stage('Build - Maven') {
 		steps {
 			sh 'mvn clean install'
-			jiraSendBuildInfo site: 'jira-devops18.atlassian.net', branch: 'devops-development'
+			rtUpload (
+			    spec: '''{
+				  "files": [
+				    {
+				      "pattern": "/var/lib/jenkins/workspace/devops-pipeline/",
+				      "target": "/var/lib/jenkins/workspace/devops-pipeline/target/"
+				    }
+				 ]
+			    }'''
+			)
 //			rtMavenRun (
 //			    // Tool name from Jenkins configuration.
 //			    tool: 'maven',
@@ -76,8 +85,7 @@ pipeline {
 			script {
 				deploy adapters: [tomcat8(credentialsId: 'tomcat', path: '', url: 'http://23.101.207.158:8080/')], contextPath: '/QAWebapp', war: '**/*.war'	
 				slackSend channel: '#devops', tokenCredentialId: 'slacktoken', message: "Deployed to Test ${env.JOB_NAME} ${env.BUILD_NUMBER}"					
-			}
-			jiraSendDeploymentInfo environmentId: 'Test', environmentName: 'QA Test', environmentType: 'testing', serviceIds: ['http://23.101.207.158:8080/QAWebapp/'], site: 'jira-devops18.atlassian.net', state: 'successful'
+			}			
 		}
    	}	
 //	stage('Perform UI Test - Publish Report') {
