@@ -24,7 +24,7 @@ pipeline {
 
 		rtMavenDeployer (
 		    id: 'deployer-artifactory',
-		    serverId: 'artifactory',
+		    serverId: 'Artifactory',
 		    releaseRepo: 'libs-release-local',
 		    snapshotRepo: 'libs-snapshot-local',
 		    // By default, 3 threads are used to upload the artifacts to Artifactory. You can override this default by setting:
