@@ -12,7 +12,7 @@ pipeline {
 		slackSend channel: '#devops', tokenCredentialId: 'slacktoken', message: "Pipeline build ${env.JOB_NAME} ${env.BUILD_NUMBER} (<${env.BUILD_URL}|Open>)"
                 rtServer (
                     id: 'Artifactory',
-                    url: 'https://ansibledevops.jfrog.io/artifactory',
+                    url: 'https://jfrogjenkins.jfrog.io/artifactory',
                     credentialsId: 'artifactory'
                 )
 		rtMavenResolver (
@@ -47,39 +47,28 @@ pipeline {
 //	}
 	stage('Build - Maven') {
 		steps {
-			sh 'mvn clean install'
-			rtUpload (
-			    serverId: 'Artifactory',
-			    spec: '''{
-				  "files": [
-				    {
-				      "pattern": "/var/lib/jenkins/.m2/repository/WEBPOC/AVNCommunication/1.0/AVNCommunication-1.0.war",
-				      "target": "libs-release-local/WEBPOC/AVNCommunication/"
-				    }
-				 ]
-			    }'''
-			)
-//			rtMavenRun (
-//			    // Tool name from Jenkins configuration.
-//			    tool: 'maven',
-//			    pom: 'pom.xml',
-//			    goals: '-U clean install -e',
-//			    // Maven options.
-//			    opts: '-Xms1024m -Xmx4096m',
-//			    resolverId: 'resolver-artifactory',
-//			    deployerId: 'deployer-artifactory'
+//			sh 'mvn clean install'
+			rtMavenRun (
+			    // Tool name from Jenkins configuration.
+			    tool: 'maven',
+			    pom: 'pom.xml',
+			    goals: '-U clean install -e',
+			    // Maven options.
+			    opts: '-Xms1024m -Xmx4096m',
+			    resolverId: 'resolver-artifactory',
+			    deployerId: 'deployer-artifactory'
 //			    // If the build name and build number are not set here, the current job name and number will be used:
 //			)
 			slackSend channel: '#devops', tokenCredentialId: 'slacktoken', message: "Build Success ${env.JOB_NAME} ${env.BUILD_NUMBER}"
 		}
    	}
-//     	stage('Store the Artifacts') {
-//		steps {
-//			rtPublishBuildInfo (
-//			    serverId: 'Artifactory'
-//			)
-//		}
-//   	}	    	    
+     	stage('Store the Artifacts') {
+		steps {
+			rtPublishBuildInfo (
+			    serverId: 'Artifactory'
+			)
+		}
+   	}	    	    
 				
     	stage('Deploy to Test') {
 		steps{
