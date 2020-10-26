@@ -48,7 +48,7 @@ pipeline {
 	stage('Build - Maven') {
 		steps {
 			sh 'mvn clean install'
-			jiraSendBuildInfo branch: '', site: 'jira-devops18.atlassian.net'
+			jiraSendBuildInfo site: 'jira-devops18.atlassian.net'
 //			rtMavenRun (
 //			    // Tool name from Jenkins configuration.
 //			    tool: 'maven',
