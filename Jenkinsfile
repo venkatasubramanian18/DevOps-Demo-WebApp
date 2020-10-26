@@ -47,16 +47,16 @@ pipeline {
 	}
 	stage('Build - Maven') {
 		steps {
-			sh 'mvn clean install'
-//			rtMavenRun (
-//			    // Tool name from Jenkins configuration.
-//			    tool: 'maven',
-//			    pom: 'pom.xml',
-//			    goals: '-U clean install -e',
-//			    // Maven options.
-//			    opts: '-Xms1024m -Xmx4096m',
-//			    resolverId: 'resolver-artifactory',
-//			    deployerId: 'deployer-artifactory'
+//			sh 'mvn clean install'
+			rtMavenRun (
+			    // Tool name from Jenkins configuration.
+			    tool: 'maven',
+			    pom: 'pom.xml',
+			    goals: '-U clean install -e',
+			    // Maven options.
+			    opts: '-Xms1024m -Xmx4096m',
+			    resolverId: 'resolver-artifactory',
+			    deployerId: 'deployer-artifactory'
 //			    // If the build name and build number are not set here, the current job name and number will be used:
 //			)
 		}
