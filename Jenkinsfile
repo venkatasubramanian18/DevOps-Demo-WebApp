@@ -1,4 +1,4 @@
-//Pipeline for DEVOPS:
+//Pipeline for full DEVOPS:
 pipeline {
     agent any
 	
