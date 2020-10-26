@@ -54,7 +54,7 @@ pipeline {
 				  "files": [
 				    {
 				      "pattern": "/var/lib/jenkins/.m2/repository/WEBPOC/AVNCommunication/1.0/AVNCommunication-1.0.war",
-				      "target": "libs-release/WEBPOC/AVNCommunication/1.0/"
+				      "target": "libs-release-local/WEBPOC/AVNCommunication/"
 				    }
 				 ]
 			    }'''
