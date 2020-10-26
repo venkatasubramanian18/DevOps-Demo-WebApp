@@ -11,9 +11,9 @@ pipeline {
         stage ('Artifactory configuration') {
             steps {
                 rtServer (
-                    id: "Artifactory",
-                    url: "https://ansibledevops.jfrog.io/artifactory/",
-                    credentialsId: "artifactory"
+                    id: 'Artifactory',
+                    url: 'https://ansibledevops.jfrog.io/artifactory',
+                    credentialsId: 'artifactory'
                 )
 		rtMavenResolver (
 		    id: 'resolver-artifactory',
