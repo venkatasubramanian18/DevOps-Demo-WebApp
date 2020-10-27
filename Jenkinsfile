@@ -61,19 +61,16 @@ pipeline {
 			    deployerId: 'deployer-artifactory'
 //			    // If the build name and build number are not set here, the current job name and number will be used:
 			)
-			rtPublishBuildInfo (
-			    serverId: 'Artifactory'
-			)
 			slackSend channel: '#devops', tokenCredentialId: 'slacktoken', message: "Build Success ${env.JOB_NAME} ${env.BUILD_NUMBER}"
 		}
    	}
-//     	stage('Store the Artifacts') {
-//		steps {
-//			rtPublishBuildInfo (
-//			    serverId: 'Artifactory'
-//			)
-//		}
-// 	}	    	    
+     	stage('Store the Artifacts') {
+		steps {
+			rtPublishBuildInfo (
+			    serverId: 'Artifactory'
+			)
+		}
+ 	}	    	    
 				
     	stage('Deploy to Test') {
 		steps{
