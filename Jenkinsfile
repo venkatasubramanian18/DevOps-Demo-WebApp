@@ -12,7 +12,7 @@ pipeline {
 		slackSend channel: '#devops', tokenCredentialId: 'slacktoken', message: "Pipeline build ${env.JOB_NAME} ${env.BUILD_NUMBER} (<${env.BUILD_URL}|Open>)"
                 rtServer (
                     id: 'Artifactory',
-                    url: 'https://jfrogjenkins.jfrog.io/artifactory',
+                    url: 'https://devops100.jfrog.io/artifactory',
                     credentialsId: 'artifactory'
                 )
 		rtMavenResolver (
@@ -52,7 +52,7 @@ pipeline {
 			    // Tool name from Jenkins configuration.
 			    tool: 'maven',
 			    pom: 'pom.xml',
-			    goals: 'clean install -Dmaven.repo.local=.m2',
+			    goals: 'clean install',
 			    //goals: 'clean install',
 			    // Maven options.
 			    opts: '-Xms1024m -Xmx4096m',
