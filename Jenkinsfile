@@ -12,7 +12,7 @@ pipeline {
 		slackSend channel: '#devops', tokenCredentialId: 'slacktoken', message: "Pipeline build ${env.JOB_NAME} ${env.BUILD_NUMBER} (<${env.BUILD_URL}|Open>)"
                 rtServer (
                     id: 'Artifactory',
-                    url: 'https://devops100.jfrog.io/artifactory',
+                    url: 'https://testdevops.jfrog.io/artifactory',
                     credentialsId: 'artifactory'
                 )
 		rtMavenResolver (
