@@ -33,8 +33,7 @@ pipeline {
 //		)
 		    script {
 			def server = Artifactory.server "artifactory"
-			def rtMaven = Artifactory.newMavenBuild()
-			def buildInfo = Artifactory.newBuildInfo()
+			def rtMaven = Artifactory.newMavenBuild()			
 			rtMaven.tool = "maven"
 			rtMaven.deployer releaseRepo:'libs-release-local', snapshotRepo:'libs-snapshot-local', server: server
 			rtMaven.resolver releaseRepo:'libs-release', snapshotRepo:'libs-snapshot', server: server
@@ -71,6 +70,7 @@ pipeline {
 //			    // If the build name and build number are not set here, the current job name and number will be used:
 //			)			
 			script {
+				def buildInfo = Artifactory.newBuildInfo()
 				buildInfo = rtMaven.run pom: 'pom.xml', goals: 'clean install -e', buildInfo: buildInfo
 			}
 			slackSend channel: '#devops', tokenCredentialId: 'slacktoken', message: "Build Success ${env.JOB_NAME} ${env.BUILD_NUMBER}"
