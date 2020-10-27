@@ -66,9 +66,20 @@ pipeline {
    	}
      	stage('Store the Artifacts') {
 		steps {
-			rtPublishBuildInfo (
-			    serverId: 'Artifactory'
-			)
+//			rtPublishBuildInfo (
+//			    serverId: 'Artifactory'
+//			)
+			script {
+				def server = Artifactory.server "artifactory"
+				def rtMaven = Artifactory.newMavenBuild()
+				def buildInfo = Artifactory.newBuildInfo()
+				rtMaven.tool = "maven"
+				rtMaven.deployer releaseRepo:'libs-release-local', snapshotRepo:'libs-snapshot-local', server: server
+        			rtMaven.resolver releaseRepo:'libs-release', snapshotRepo:'libs-snapshot', server: server
+        			rtMaven.deployer.deployArtifacts = false // Disable artifacts deployment during Maven run
+				buildInfo = rtMaven.run pom: 'pom.xml', goals: 'clean install -e', buildInfo: buildInfo
+				server.publishBuildInfo buildInfo
+			}
 		}
  	}	    	    
 				
