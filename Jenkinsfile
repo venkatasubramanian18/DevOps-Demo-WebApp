@@ -10,26 +10,25 @@ pipeline {
         stage ('Artifactory configuration') {
             steps {
 		slackSend channel: '#devops', tokenCredentialId: 'slacktoken', message: "Pipeline build ${env.JOB_NAME} ${env.BUILD_NUMBER} (<${env.BUILD_URL}|Open>)"
-//              rtServer (
-//                   id: 'Artifactory',
-//                   url: 'https://devops111.jfrog.io',
-//                    credentialsId: 'artifactory'
-//                )
-//		rtMavenResolver (
-//		    id: 'resolver-artifactory',
-//		    serverId: 'Artifactory',
-//		    releaseRepo: 'libs-release',
-//		    snapshotRepo: 'libs-snapshot'
-//		)  
-//
-//		rtMavenDeployer (
-//		    id: 'deployer-artifactory',
-//		    serverId: 'Artifactory',
-//		    deployArtifacts: false,
-//		    releaseRepo: 'libs-release-local',
-//		    snapshotRepo: 'libs-snapshot-local',
+                rtServer (
+                   id: 'Artifactory',
+                   url: 'https://devops111.jfrog.io',
+                   credentialsId: 'artifactory'
+                )
+		rtMavenResolver (
+		    id: 'resolver-artifactory',
+		    serverId: 'Artifactory',
+		    releaseRepo: 'libs-release',
+		    snapshotRepo: 'libs-snapshot'
+		)  
+		rtMavenDeployer (
+		    id: 'deployer-artifactory',
+		    serverId: 'Artifactory',
+		    deployArtifacts: false,
+		    releaseRepo: 'libs-release-local',
+		    snapshotRepo: 'libs-snapshot-local',
 //		    // By default, 3 threads are used to upload the artifacts to Artifactory. You can override this default by setting:
-//		    threads: 6,
+		    threads: 6,
 //		)
             }
         }	    
@@ -63,12 +62,12 @@ pipeline {
 //			)			
 			script {
 				def server = Artifactory.server "artifactory"
-				def rtMaven = Artifactory.newMavenBuild()			
+				def rtMaven = Artifactory.newMavenBuild()	
+				def buildInfo = Artifactory.newBuildInfo()
 				rtMaven.tool = "maven"
 				rtMaven.deployer releaseRepo:'libs-release-local', snapshotRepo:'libs-snapshot-local', server: server
 				rtMaven.resolver releaseRepo:'libs-release', snapshotRepo:'libs-snapshot', server: server
 				rtMaven.deployer.deployArtifacts = false // Disable artifacts deployment during Maven run
-				def buildInfo = Artifactory.newBuildInfo()
 				buildInfo = rtMaven.run pom: 'pom.xml', goals: 'clean install -e', buildInfo: buildInfo
 			}
 			slackSend channel: '#devops', tokenCredentialId: 'slacktoken', message: "Build Success ${env.JOB_NAME} ${env.BUILD_NUMBER}"
