@@ -10,27 +10,36 @@ pipeline {
         stage ('Artifactory configuration') {
             steps {
 		slackSend channel: '#devops', tokenCredentialId: 'slacktoken', message: "Pipeline build ${env.JOB_NAME} ${env.BUILD_NUMBER} (<${env.BUILD_URL}|Open>)"
-                rtServer (
-                    id: 'Artifactory',
-                    url: 'https://devops111.jfrog.io',
-                    credentialsId: 'artifactory'
-                )
-		rtMavenResolver (
-		    id: 'resolver-artifactory',
-		    serverId: 'Artifactory',
-		    releaseRepo: 'libs-release',
-		    snapshotRepo: 'libs-snapshot'
-		)  
-
-		rtMavenDeployer (
-		    id: 'deployer-artifactory',
-		    serverId: 'Artifactory',
-		    deployArtifacts: false,
-		    releaseRepo: 'libs-release-local',
-		    snapshotRepo: 'libs-snapshot-local',
-		    // By default, 3 threads are used to upload the artifacts to Artifactory. You can override this default by setting:
-		    threads: 6,
-		)
+//              rtServer (
+//                   id: 'Artifactory',
+//                   url: 'https://devops111.jfrog.io',
+//                    credentialsId: 'artifactory'
+//                )
+//		rtMavenResolver (
+//		    id: 'resolver-artifactory',
+//		    serverId: 'Artifactory',
+//		    releaseRepo: 'libs-release',
+//		    snapshotRepo: 'libs-snapshot'
+//		)  
+//
+//		rtMavenDeployer (
+//		    id: 'deployer-artifactory',
+//		    serverId: 'Artifactory',
+//		    deployArtifacts: false,
+//		    releaseRepo: 'libs-release-local',
+//		    snapshotRepo: 'libs-snapshot-local',
+//		    // By default, 3 threads are used to upload the artifacts to Artifactory. You can override this default by setting:
+//		    threads: 6,
+//		)
+		    script {
+			def server = Artifactory.server "artifactory"
+			def rtMaven = Artifactory.newMavenBuild()
+			def buildInfo = Artifactory.newBuildInfo()
+			rtMaven.tool = "maven"
+			rtMaven.deployer releaseRepo:'libs-release-local', snapshotRepo:'libs-snapshot-local', server: server
+			rtMaven.resolver releaseRepo:'libs-release', snapshotRepo:'libs-snapshot', server: server
+			rtMaven.deployer.deployArtifacts = false // Disable artifacts deployment during Maven run
+		    }
             }
         }	    
         stage('SCM - GIT Commit') {
@@ -49,17 +58,20 @@ pipeline {
 	stage('Build - Maven') {
 		steps {
 //			sh 'mvn clean install'
-			rtMavenRun (
-			    // Tool name from Jenkins configuration.
-			    tool: 'maven',
-			    pom: 'pom.xml',
-			    goals: 'clean install -e -o',
-			    //goals: 'clean install',
-			    // Maven options.
-			    opts: '-Xms1024m -Xmx4096m',
-			    resolverId: 'resolver-artifactory',
-			    deployerId: 'deployer-artifactory'
+//			rtMavenRun (
+//			    // Tool name from Jenkins configuration.
+//			    tool: 'maven',
+//			    pom: 'pom.xml',
+//			    goals: 'clean install -e -o',
+//			    //goals: 'clean install',
+//			    // Maven options.
+//			    opts: '-Xms1024m -Xmx4096m',
+//			    resolverId: 'resolver-artifactory',
+//			    deployerId: 'deployer-artifactory'
 //			    // If the build name and build number are not set here, the current job name and number will be used:
+			script {
+				buildInfo = rtMaven.run pom: 'pom.xml', goals: 'clean install -e', buildInfo: buildInfo
+			}
 			)
 			slackSend channel: '#devops', tokenCredentialId: 'slacktoken', message: "Build Success ${env.JOB_NAME} ${env.BUILD_NUMBER}"
 		}
@@ -69,15 +81,7 @@ pipeline {
 //			rtPublishBuildInfo (
 //			    serverId: 'Artifactory'
 //			)
-			script {
-				def server = Artifactory.server "artifactory"
-				def rtMaven = Artifactory.newMavenBuild()
-				def buildInfo = Artifactory.newBuildInfo()
-				rtMaven.tool = "maven"
-				rtMaven.deployer releaseRepo:'libs-release-local', snapshotRepo:'libs-snapshot-local', server: server
-        			rtMaven.resolver releaseRepo:'libs-release', snapshotRepo:'libs-snapshot', server: server
-        			rtMaven.deployer.deployArtifacts = false // Disable artifacts deployment during Maven run
-				buildInfo = rtMaven.run pom: 'pom.xml', goals: 'clean install -e', buildInfo: buildInfo
+			script {				
 				server.publishBuildInfo buildInfo
 			}
 		}
