@@ -31,14 +31,6 @@ pipeline {
 //		    // By default, 3 threads are used to upload the artifacts to Artifactory. You can override this default by setting:
 //		    threads: 6,
 //		)
-		    script {
-			def server = Artifactory.server "artifactory"
-			def rtMaven = Artifactory.newMavenBuild()			
-			rtMaven.tool = "maven"
-			rtMaven.deployer releaseRepo:'libs-release-local', snapshotRepo:'libs-snapshot-local', server: server
-			rtMaven.resolver releaseRepo:'libs-release', snapshotRepo:'libs-snapshot', server: server
-			rtMaven.deployer.deployArtifacts = false // Disable artifacts deployment during Maven run
-		    }
             }
         }	    
         stage('SCM - GIT Commit') {
@@ -70,6 +62,12 @@ pipeline {
 //			    // If the build name and build number are not set here, the current job name and number will be used:
 //			)			
 			script {
+				def server = Artifactory.server "artifactory"
+				def rtMaven = Artifactory.newMavenBuild()			
+				rtMaven.tool = "maven"
+				rtMaven.deployer releaseRepo:'libs-release-local', snapshotRepo:'libs-snapshot-local', server: server
+				rtMaven.resolver releaseRepo:'libs-release', snapshotRepo:'libs-snapshot', server: server
+				rtMaven.deployer.deployArtifacts = false // Disable artifacts deployment during Maven run
 				def buildInfo = Artifactory.newBuildInfo()
 				buildInfo = rtMaven.run pom: 'pom.xml', goals: 'clean install -e', buildInfo: buildInfo
 			}
