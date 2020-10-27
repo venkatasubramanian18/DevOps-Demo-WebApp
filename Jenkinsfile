@@ -30,7 +30,8 @@ pipeline {
 //		    // By default, 3 threads are used to upload the artifacts to Artifactory. You can override this default by setting:
 //		    threads: 6
 //		)
-            }	    
+            }	
+	}			
         stage('SCM - GIT Commit') {
             steps {
                 // Get some code from a GitHub repository
