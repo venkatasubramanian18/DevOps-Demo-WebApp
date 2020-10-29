@@ -89,7 +89,7 @@ pipeline {
       		}
     	}  
      	stage('Store the Artifacts') {
-		parellel {
+		parallel {
 			stage {
 				steps {
 					script {
