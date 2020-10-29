@@ -71,42 +71,37 @@ pipeline {
 //			slackSend channel: '#devops', tokenCredentialId: 'slacktoken', message: "Build Success ${env.JOB_NAME} ${env.BUILD_NUMBER}"
 //		}
 // 	} 
-     	stage('Config, Build & Store the Artifacts') {
-		steps {
-//			rtPublishBuildInfo (
-//			    serverId: 'Artifactory'
-//			)
-			script {
-				def server = Artifactory.server "artifactory"
-				def rtMaven = Artifactory.newMavenBuild()
-				def buildInfo = Artifactory.newBuildInfo()
-				rtMaven.tool = "maven"
-				rtMaven.deployer releaseRepo:'libs-release-local', snapshotRepo:'libs-snapshot-local', server: server
-         			rtMaven.resolver releaseRepo:'libs-release', snapshotRepo:'libs-snapshot', server: server
-    				rtMaven.deployer.deployArtifacts = false // Disable artifacts deployment during Maven run
-				buildInfo = rtMaven.run pom: 'pom.xml', goals: 'clean install -e', buildInfo: buildInfo
-				server.publishBuildInfo buildInfo
+     	stage('Build') {
+		parallel{
+			stage('Config, Build & Store Artifact') {
+				steps {
+					script {
+						def server = Artifactory.server "artifactory"
+						def rtMaven = Artifactory.newMavenBuild()
+						def buildInfo = Artifactory.newBuildInfo()
+						rtMaven.tool = "maven"
+						rtMaven.deployer releaseRepo:'libs-release-local', snapshotRepo:'libs-snapshot-local', server: server
+						rtMaven.resolver releaseRepo:'libs-release', snapshotRepo:'libs-snapshot', server: server
+						rtMaven.deployer.deployArtifacts = false // Disable artifacts deployment during Maven run
+						buildInfo = rtMaven.run pom: 'pom.xml', goals: 'clean install -e', buildInfo: buildInfo
+						server.publishBuildInfo buildInfo
+					}
+					slackSend channel: '#devops', tokenCredentialId: 'slacktoken', message: "Build Success and Stored in Artifact ${env.JOB_NAME} ${env.BUILD_NUMBER}"
+				}
 			}
-			slackSend channel: '#devops', tokenCredentialId: 'slacktoken', message: "Build Success and Stored in Artifact ${env.JOB_NAME} ${env.BUILD_NUMBER}"
+			stage('Build & Push- Docker Image') {
+				steps {
+					script {
+						dockerImage = docker.build registry + ":$BUILD_NUMBER"
+						docker.withRegistry( '', registryCredential ) {
+                				dockerImage.push()
+					}
+					slackSend channel: '#devops', tokenCredentialId: 'slacktoken', message: "Docker Image Push Success ${env.JOB_NAME} ${env.BUILD_NUMBER}"
+				}
+			}			
 		}
  	}    	    
-	stage('Build - Docker Image') {
-		steps {
-			script {
-          			dockerImage = docker.build registry + ":$BUILD_NUMBER"
-        		}
-		}
-   	}	  
-    	stage('Push - Docker Image') {
-      		steps{    
-          		script {
-              			docker.withRegistry( '', registryCredential ) {
-                		dockerImage.push()
-              			}
-          		}
-			slackSend channel: '#devops', tokenCredentialId: 'slacktoken', message: "Docker Image Push Success ${env.JOB_NAME} ${env.BUILD_NUMBER}"
-      		}
-    	} 	    				
+	  	    				
     	stage('Deploy to Test') {
 		steps{
 			script {
