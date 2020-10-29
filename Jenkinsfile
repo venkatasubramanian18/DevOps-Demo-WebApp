@@ -135,7 +135,7 @@ pipeline {
 //			}
 //		}
 //	}
-//	    
+	    
 //	stage('Performance Test - Blazemeter') {
 //		steps{
 //	   		blazeMeterTest credentialsId: 'Blazemeter', testId: '8626535.taurus', workspaceId: '677291'
@@ -160,7 +160,7 @@ pipeline {
 //			}
 //		}
 //	 }	 	    
-  }
+    }
     post {
 	success {
 		echo 'All stages ran successfully'
