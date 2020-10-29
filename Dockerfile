@@ -8,4 +8,4 @@ COPY target/AVNCommunication-1.0.war /jenkins/docker/webapp/
 
 EXPOSE 8000
 
-CMD [“catalina.sh”, “run”]
+CMD [“./start.sh”, “run”]
