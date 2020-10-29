@@ -38,13 +38,13 @@ pipeline {
                 git credentialsId: 'github', url: 'git@github.com:venkatasubramanian18/DevOps-Demo-WebApp.git'				
             }
         }
-//       stage('Code Analysis - SonarQube') {
-//		steps {
-//			withSonarQubeEnv(credentialsId: 'sonar', installationName: 'sonarqube') { 
-//				sh 'mvn clean package sonar:sonar -Dsonar.host.url=http://23.100.47.167:9000 -Dsonar.sources=. -Dsonar.tests=. -Dsonar.inclusions=**/test/java/servlet/createpage_junit.java -Dsonar.test.exclusions=**/test/java/servlet/createpage_junit.java -Dsonar.login=admin -Dsonar.password=admin'
-//			}
-//		}
-//	}
+       stage('Code Analysis - SonarQube') {
+		steps {
+			withSonarQubeEnv(credentialsId: 'sonar', installationName: 'sonarqube') { 
+				sh 'mvn clean package sonar:sonar -Dsonar.host.url=http://23.100.47.167:9000 -Dsonar.sources=. -Dsonar.tests=. -Dsonar.inclusions=**/test/java/servlet/createpage_junit.java -Dsonar.test.exclusions=**/test/java/servlet/createpage_junit.java -Dsonar.login=admin -Dsonar.password=admin'
+			}
+		}
+	}
 	stage('Build - Maven') {
 		steps {
 //			sh 'mvn clean install'
@@ -90,15 +90,15 @@ pipeline {
 			}			
 		}
    	}	
-//	stage('Perform UI Test - Publish Report') {
-//		steps{
-//			script {
-//			  sh 'mvn -f functionaltest/pom.xml package'
-//			  sh 'mvn package test'
-//			  publishHTML([allowMissing: false, alwaysLinkToLastBuild: false, keepAll: false, reportDir: '\\functionaltest\\target\\surefire-reports', reportFiles: 'index.html', reportName: 'UI Test Report', reportTitles: ''])
-//			}
-//		}
-//	}
+	stage('Perform UI Test - Publish Report') {
+		steps{
+			script {
+			  sh 'mvn -f functionaltest/pom.xml package'
+			  sh 'mvn package test'
+			  publishHTML([allowMissing: false, alwaysLinkToLastBuild: false, keepAll: false, reportDir: '\\functionaltest\\target\\surefire-reports', reportFiles: 'index.html', reportName: 'UI Test Report', reportTitles: ''])
+			}
+		}
+	}
 	    
 //	stage('Performance Test - Blazemeter') {
 //		steps{
@@ -114,16 +114,16 @@ pipeline {
 		}
 	}	
 	    
-//	stage('Perform Sanity Test - Publish Report') {
-//		steps{
-//			script {
-//			     sh 'mvn -f Acceptancetest/pom.xml package'
-//			     sh 'mvn package test'
-//			     publishHTML([allowMissing: false, alwaysLinkToLastBuild: false, keepAll: false, reportDir: '\\Acceptancetest\\target\\surefire-reports', reportFiles: 'index.html', reportName: 'Sanity Test Report', reportTitles: ''])
-//			     slackSend channel: '#devops', tokenCredentialId: 'slacktoken', message: "Perform Sanity Test - Publish Report ${env.JOB_NAME} ${env.BUILD_NUMBER}"
-//			}
-//		}
-//	 }	 	    
+	stage('Perform Sanity Test - Publish Report') {
+		steps{
+			script {
+			     sh 'mvn -f Acceptancetest/pom.xml package'
+			     sh 'mvn package test'
+			     publishHTML([allowMissing: false, alwaysLinkToLastBuild: false, keepAll: false, reportDir: '\\Acceptancetest\\target\\surefire-reports', reportFiles: 'index.html', reportName: 'Sanity Test Report', reportTitles: ''])
+			     slackSend channel: '#devops', tokenCredentialId: 'slacktoken', message: "Perform Sanity Test - Publish Report ${env.JOB_NAME} ${env.BUILD_NUMBER}"
+			}
+		}
+	 }	 	    
     }
     post {
 	success {
