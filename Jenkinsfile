@@ -99,8 +99,13 @@ pipeline {
 					}
 					slackSend channel: '#devops', tokenCredentialId: 'slacktoken', message: "Docker Image Push Success ${env.JOB_NAME} ${env.BUILD_NUMBER}"
 				}
-			}			
-		}
+			}	
+		        stage('Clean Unused server space') {
+		        	steps{
+					sh "docker rmi $registry:$BUILD_NUMBER"
+		      		}
+		    	}			
+		}	
  	}    	    
 	  	    				
     	stage('Deploy to Test') {
