@@ -89,22 +89,32 @@ pipeline {
 					slackSend channel: '#devops', tokenCredentialId: 'slacktoken', message: "Build Success and Stored in Artifact ${env.JOB_NAME} ${env.BUILD_NUMBER}"
 				}
 			}
-			stage('Build & Push- Docker Image') {
-				steps {
-					script {
-						dockerImage = docker.build registry + ":$BUILD_NUMBER"
-						docker.withRegistry( '', registryCredential ) {
-                					dockerImage.push()
+			stage('Docker Image') {
+				stages{
+					stage('Build Docker Image') {
+						steps {
+							script {
+								dockerImage = docker.build registry + ":$BUILD_NUMBER"
+							}							
 						}
 					}
-					slackSend channel: '#devops', tokenCredentialId: 'slacktoken', message: "Docker Image Push Success ${env.JOB_NAME} ${env.BUILD_NUMBER}"
+					stage('Push Docker Image') {
+						steps {
+							script {
+								docker.withRegistry( '', registryCredential ) {
+									dockerImage.push()
+								}
+							}
+							slackSend channel: '#devops', tokenCredentialId: 'slacktoken', message: "Docker Image Push Success ${env.JOB_NAME} ${env.BUILD_NUMBER}"
+						}
+					}	
+					stage('Cleanup server space') {
+						steps{
+							sh "docker rmi $registry:$BUILD_NUMBER"
+						}
+					}					
 				}
-			}	
-		        stage('Clean Unused server space') {
-		        	steps{
-					sh "docker rmi $registry:$BUILD_NUMBER"
-		      		}
-		    	}			
+			}				
 		}	
  	}    	    
 	  	    				
