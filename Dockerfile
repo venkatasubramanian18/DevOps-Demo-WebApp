@@ -2,4 +2,4 @@
 From tomcat:latest
 
 # copy war file on to container 
-COPY ./var/lib/jenkins/workspace/devops-pipeline/target/AVNCommunication-1.0.war /usr/local/devops-pipeline/
+COPY ./var/lib/jenkins/workspace/docker/target/AVNCommunication-1.0.war /usr/local/devops-pipeline/
