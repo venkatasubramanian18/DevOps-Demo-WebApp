@@ -4,6 +4,9 @@ pipeline {
 	registry = "devopstraining18/mavenbuild"
 	registryCredential = 'dockerhub'
 	dockerImage = ''
+	def server = Artifactory.server "artifactory"
+	def rtMaven = Artifactory.newMavenBuild()
+	def buildInfo = Artifactory.newBuildInfo()
     }	
 	
     agent any
@@ -93,9 +96,9 @@ pipeline {
 			stage('Config') {
 				steps {
 					script {
-						def server = Artifactory.server "artifactory"
-						def rtMaven = Artifactory.newMavenBuild()
-						def buildInfo = Artifactory.newBuildInfo()
+						//def server = Artifactory.server "artifactory"
+						//def rtMaven = Artifactory.newMavenBuild()
+						//def buildInfo = Artifactory.newBuildInfo()
 						rtMaven.tool = "maven"
 						rtMaven.deployer releaseRepo:'libs-release-local', snapshotRepo:'libs-snapshot-local', server: server
 		     				rtMaven.resolver releaseRepo:'libs-release', snapshotRepo:'libs-snapshot', server: server
