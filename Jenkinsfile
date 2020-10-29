@@ -94,7 +94,8 @@ pipeline {
 					script {
 						dockerImage = docker.build registry + ":$BUILD_NUMBER"
 						docker.withRegistry( '', registryCredential ) {
-                				dockerImage.push()
+                					dockerImage.push()
+						}
 					}
 					slackSend channel: '#devops', tokenCredentialId: 'slacktoken', message: "Docker Image Push Success ${env.JOB_NAME} ${env.BUILD_NUMBER}"
 				}
