@@ -1,5 +1,11 @@
 //Pipeline for full DEVOPS:
 pipeline {
+    environment {
+	registry = "devopstraining18/mavenbuild"
+	registryCredential = 'dockerhub'
+	dockerImage = ''
+    }	
+	
     agent any
 	
     tools {
@@ -7,35 +13,36 @@ pipeline {
     }
 	
     stages {	
-        stage ('Artifactory configuration') {
-            steps {
-		slackSend channel: '#devops', tokenCredentialId: 'slacktoken', message: "Pipeline build ${env.JOB_NAME} ${env.BUILD_NUMBER} (<${env.BUILD_URL}|Open>)"
-                rtServer (
-                   id: 'Artifactory',
-                   url: 'https://devops111.jfrog.io',
-                   credentialsId: 'artifactory'
-                )
-		rtMavenResolver (
-		    id: 'resolver-artifactory',
-		    serverId: 'Artifactory',
-		    releaseRepo: 'libs-release',
-		    snapshotRepo: 'libs-snapshot'
-		)  
-		rtMavenDeployer (
-		    id: 'deployer-artifactory',
-		    serverId: 'Artifactory',
-		    deployArtifacts: false,
-		    releaseRepo: 'libs-release-local',
-		    snapshotRepo: 'libs-snapshot-local',
+//        stage ('Artifactory configuration') {
+//            steps {
+//		slackSend channel: '#devops', tokenCredentialId: 'slacktoken', message: "Pipeline build ${env.JOB_NAME} ${env.BUILD_NUMBER} (<${env.BUILD_URL}|Open>)"
+//                rtServer (
+//                   id: 'Artifactory',
+//                   url: 'https://devops111.jfrog.io',
+//                   credentialsId: 'artifactory'
+//                )
+//		rtMavenResolver (
+//		    id: 'resolver-artifactory',
+//		    serverId: 'Artifactory',
+//		    releaseRepo: 'libs-release',
+//		    snapshotRepo: 'libs-snapshot'
+//		)  
+//		rtMavenDeployer (
+//		    id: 'deployer-artifactory',
+//		    serverId: 'Artifactory',
+//		    deployArtifacts: false,
+//		    releaseRepo: 'libs-release-local',
+//		    snapshotRepo: 'libs-snapshot-local',
 //		    // By default, 3 threads are used to upload the artifacts to Artifactory. You can override this default by setting:
 //		    threads: 6
-		)
-            }	
-	}			
+//		)
+//            }	
+//	}			
         stage('SCM - GIT Commit') {
             steps {
                 // Get some code from a GitHub repository
-                git credentialsId: 'github', url: 'git@github.com:venkatasubramanian18/DevOps-Demo-WebApp.git'				
+                git credentialsId: 'github', url: 'git@github.com:venkatasubramanian18/DevOps-Demo-WebApp.git'	
+		slackSend channel: '#devops', tokenCredentialId: 'slacktoken', message: "Pipeline build Started ${env.JOB_NAME} ${env.BUILD_NUMBER} (<${env.BUILD_URL}|Open>)"
             }
         }
        stage('Code Analysis - SonarQube') {
@@ -43,6 +50,7 @@ pipeline {
 			withSonarQubeEnv(credentialsId: 'sonar', installationName: 'sonarqube') { 
 				sh 'mvn clean package sonar:sonar -Dsonar.host.url=http://23.100.47.167:9000 -Dsonar.sources=. -Dsonar.tests=. -Dsonar.inclusions=**/test/java/servlet/createpage_junit.java -Dsonar.test.exclusions=**/test/java/servlet/createpage_junit.java -Dsonar.login=admin -Dsonar.password=admin'
 			}
+			slackSend channel: '#devops', tokenCredentialId: 'slacktoken', message: "SonarQube Analysis Succeed ${env.JOB_NAME} ${env.BUILD_NUMBER} (<${env.BUILD_URL}|Open>)"
 		}
 	}
 	stage('Build - Maven') {
@@ -63,7 +71,24 @@ pipeline {
 			slackSend channel: '#devops', tokenCredentialId: 'slacktoken', message: "Build Success ${env.JOB_NAME} ${env.BUILD_NUMBER}"
 		}
    	}
-     	stage('Store the Artifacts') {
+	stage('Build - Docker Image') {
+		steps {
+			script {
+          			dockerImage = docker.build registry + ":$BUILD_NUMBER"
+        		}
+		}
+   	}	  
+    	stage('Push - Docker Image') {
+      		steps{    
+          		script {
+              			docker.withRegistry( '', registryCredential ) {
+                		dockerImage.push()
+              			}
+          		}
+			slackSend channel: '#devops', tokenCredentialId: 'slacktoken', message: "Docker Image Push Success ${env.JOB_NAME} ${env.BUILD_NUMBER}"
+      		}
+    	}  	    
+     	stage('Config & Store the Artifacts') {
 		steps {
 //			rtPublishBuildInfo (
 //			    serverId: 'Artifactory'
