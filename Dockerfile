@@ -11,7 +11,7 @@ COPY target/AVNCommunication-1.0.war /usr/local/tomcat/webapps/
 WORKDIR /usr/local/tomcat/webapps/
 
 # build for release
-RUN mvn package
+RUN mvn clean install -e
 
 EXPOSE 8000
 
