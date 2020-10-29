@@ -90,7 +90,7 @@ pipeline {
     	}  
      	stage('Store the Artifacts') {
 		parallel {
-			stage {
+			stage('Config') {
 				steps {
 					script {
 						def server = Artifactory.server "artifactory"
@@ -104,7 +104,7 @@ pipeline {
 					}
 				}
 			}
-			stage {
+			stage('Build') {
 				steps {
 		//			rtPublishBuildInfo (
 		//			    serverId: 'Artifactory'
