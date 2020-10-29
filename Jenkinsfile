@@ -4,9 +4,6 @@ pipeline {
 	registry = "devopstraining18/mavenbuild"
 	registryCredential = 'dockerhub'
 	dockerImage = ''
-	server = Artifactory.server 'artifactory'
-	rtMaven = Artifactory.newMavenBuild()
-	buildInfo = Artifactory.newBuildInfo()
     }	
 	
     agent any
@@ -48,14 +45,14 @@ pipeline {
 		slackSend channel: '#devops', tokenCredentialId: 'slacktoken', message: "Pipeline build Started ${env.JOB_NAME} ${env.BUILD_NUMBER} (<${env.BUILD_URL}|Open>)"
             }
         }
-//       stage('Code Analysis - SonarQube') {
-//		steps {
-//			withSonarQubeEnv(credentialsId: 'sonar', installationName: 'sonarqube') { 
-//				sh 'mvn clean package sonar:sonar -Dsonar.host.url=http://23.100.47.167:9000 -Dsonar.sources=. -Dsonar.tests=. -Dsonar.inclusions=**/test/java/servlet/createpage_junit.java -Dsonar.test.exclusions=**/test/java/servlet/createpage_junit.java -Dsonar.login=admin -Dsonar.password=admin'
-//			}
-//			slackSend channel: '#devops', tokenCredentialId: 'slacktoken', message: "SonarQube Analysis Succeed ${env.JOB_NAME} ${env.BUILD_NUMBER} (<${env.BUILD_URL}|Open>)"
-//		}
-//	}
+       stage('Code Analysis - SonarQube') {
+		steps {
+			withSonarQubeEnv(credentialsId: 'sonar', installationName: 'sonarqube') { 
+				sh 'mvn clean package sonar:sonar -Dsonar.host.url=http://23.100.47.167:9000 -Dsonar.sources=. -Dsonar.tests=. -Dsonar.inclusions=**/test/java/servlet/createpage_junit.java -Dsonar.test.exclusions=**/test/java/servlet/createpage_junit.java -Dsonar.login=admin -Dsonar.password=admin'
+			}
+			slackSend channel: '#devops', tokenCredentialId: 'slacktoken', message: "SonarQube Analysis Succeed ${env.JOB_NAME} ${env.BUILD_NUMBER} (<${env.BUILD_URL}|Open>)"
+		}
+	}
 //	stage('Build - Maven') {
 //		steps {
 //			sh 'mvn clean install'
@@ -73,7 +70,26 @@ pipeline {
 //			)			
 //			slackSend channel: '#devops', tokenCredentialId: 'slacktoken', message: "Build Success ${env.JOB_NAME} ${env.BUILD_NUMBER}"
 //		}
-// 	}
+// 	} 
+     	stage('Config, Build & Store the Artifacts') {
+		steps {
+//			rtPublishBuildInfo (
+//			    serverId: 'Artifactory'
+//			)
+			script {
+				def server = Artifactory.server "artifactory"
+				def rtMaven = Artifactory.newMavenBuild()
+				def buildInfo = Artifactory.newBuildInfo()
+				rtMaven.tool = "maven"
+				rtMaven.deployer releaseRepo:'libs-release-local', snapshotRepo:'libs-snapshot-local', server: server
+         			rtMaven.resolver releaseRepo:'libs-release', snapshotRepo:'libs-snapshot', server: server
+    				rtMaven.deployer.deployArtifacts = false // Disable artifacts deployment during Maven run
+				buildInfo = rtMaven.run pom: 'pom.xml', goals: 'clean install -e', buildInfo: buildInfo
+				server.publishBuildInfo buildInfo
+			}
+			slackSend channel: '#devops', tokenCredentialId: 'slacktoken', message: "Build Success and Stored in Artifact ${env.JOB_NAME} ${env.BUILD_NUMBER}"
+		}
+ 	}    	    
 	stage('Build - Docker Image') {
 		steps {
 			script {
@@ -90,44 +106,7 @@ pipeline {
           		}
 			slackSend channel: '#devops', tokenCredentialId: 'slacktoken', message: "Docker Image Push Success ${env.JOB_NAME} ${env.BUILD_NUMBER}"
       		}
-    	}  
-     	stage('Store the Artifacts') {
-		parallel {
-			stage('Config') {
-				steps {
-					script {
-						//def server = Artifactory.server "artifactory"
-						//def rtMaven = Artifactory.newMavenBuild()
-						//def buildInfo = Artifactory.newBuildInfo()
-						${rtMaven}.tool = "maven"
-						${rtMaven}.deployer releaseRepo:'libs-release-local', snapshotRepo:'libs-snapshot-local', server: ${server}
-		     				${rtMaven}.resolver releaseRepo:'libs-release', snapshotRepo:'libs-snapshot', server: server
-		   				${rtMaven}.deployer.deployArtifacts = false // Disable artifacts deployment during Maven run
-
-					}
-				}
-			}
-			stage('Build') {
-				steps {
-		//			rtPublishBuildInfo (
-		//			    serverId: 'Artifactory'
-		//			)
-					script {
-		//				def server = Artifactory.server "artifactory"
-		//				def rtMaven = Artifactory.newMavenBuild()
-		//				def buildInfo = Artifactory.newBuildInfo()
-		//				rtMaven.tool = "maven"
-		//				rtMaven.deployer releaseRepo:'libs-release-local', snapshotRepo:'libs-snapshot-local', server: server
-		//      			rtMaven.resolver releaseRepo:'libs-release', snapshotRepo:'libs-snapshot', server: server
-		//    				rtMaven.deployer.deployArtifacts = false // Disable artifacts deployment during Maven run
-						${buildInfo} = ${rtMaven}.run pom: 'pom.xml', goals: 'clean install -e', buildInfo: ${buildInfo}
-						${server}.publishBuildInfo ${buildInfo}
-					}
-				}
-			}			
-		}
- 	}    	    
-				
+    	} 	    				
     	stage('Deploy to Test') {
 		steps{
 			script {
