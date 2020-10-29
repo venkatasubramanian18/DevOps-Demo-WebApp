@@ -4,9 +4,9 @@ pipeline {
 	registry = "devopstraining18/mavenbuild"
 	registryCredential = 'dockerhub'
 	dockerImage = ''
-	def server = Artifactory.server "artifactory"
-	def rtMaven = Artifactory.newMavenBuild()
-	def buildInfo = Artifactory.newBuildInfo()
+	server = Artifactory.server 'artifactory'
+	rtMaven = Artifactory.newMavenBuild()
+	buildInfo = Artifactory.newBuildInfo()
     }	
 	
     agent any
@@ -99,10 +99,10 @@ pipeline {
 						//def server = Artifactory.server "artifactory"
 						//def rtMaven = Artifactory.newMavenBuild()
 						//def buildInfo = Artifactory.newBuildInfo()
-						rtMaven.tool = "maven"
-						rtMaven.deployer releaseRepo:'libs-release-local', snapshotRepo:'libs-snapshot-local', server: server
-		     				rtMaven.resolver releaseRepo:'libs-release', snapshotRepo:'libs-snapshot', server: server
-		   				rtMaven.deployer.deployArtifacts = false // Disable artifacts deployment during Maven run
+						${rtMaven}.tool = "maven"
+						${rtMaven}.deployer releaseRepo:'libs-release-local', snapshotRepo:'libs-snapshot-local', server: ${server}
+		     				${rtMaven}.resolver releaseRepo:'libs-release', snapshotRepo:'libs-snapshot', server: server
+		   				${rtMaven}.deployer.deployArtifacts = false // Disable artifacts deployment during Maven run
 
 					}
 				}
@@ -120,8 +120,8 @@ pipeline {
 		//				rtMaven.deployer releaseRepo:'libs-release-local', snapshotRepo:'libs-snapshot-local', server: server
 		//      			rtMaven.resolver releaseRepo:'libs-release', snapshotRepo:'libs-snapshot', server: server
 		//    				rtMaven.deployer.deployArtifacts = false // Disable artifacts deployment during Maven run
-						buildInfo = rtMaven.run pom: 'pom.xml', goals: 'clean install -e', buildInfo: buildInfo
-						server.publishBuildInfo buildInfo
+						${buildInfo} = ${rtMaven}.run pom: 'pom.xml', goals: 'clean install -e', buildInfo: ${buildInfo}
+						${server}.publishBuildInfo ${buildInfo}
 					}
 				}
 			}			
