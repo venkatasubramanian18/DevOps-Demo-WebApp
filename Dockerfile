@@ -6,7 +6,7 @@ LABEL maintainer=”venkatasubramanian18@gmail.com”
 RUN mkdir -p /var/lib/tomcat8/webapps/
 
 COPY pom.xml /var/lib/tomcat8/webapps/
-COPY ./target/AVNCommunication-1.0.war /var/lib/tomcat8/webapps/
+COPY target/AVNCommunication-1.0.war /var/lib/tomcat8/webapps/
 
 #WORKDIR /usr/local/tomcat/webapps/
 
