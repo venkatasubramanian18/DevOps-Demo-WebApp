@@ -75,9 +75,9 @@ pipeline {
 
 				serverId: "Artifactory",
 
-				buildName: "${JOB_NAME}",
+				buildName: "${env.JOB_NAME}",
 
-				buildNumber: "${BUILD_NUMBER}"
+				buildNumber: "${env.BUILD_NUMBER}"
 
 			    )
 //			slackSend channel: '#devops', tokenCredentialId: 'slacktoken', message: "Build Success ${env.JOB_NAME} ${env.BUILD_NUMBER}"
