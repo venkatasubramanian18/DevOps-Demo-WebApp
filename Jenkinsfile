@@ -68,7 +68,21 @@ pipeline {
 			    deployerId: 'deployer-artifactory'
 //			    // If the build name and build number are not set here, the current job name and number will be used:
 			)			
-			rtUpload(serverId: 'Artifactory')
+			//rtUpload(serverId: 'Artifactory')
+			    rtUpload(
+				    serverId: 'Artifactory',
+				    buildName: "build2",
+				    buildNumber: "2",
+				    spec: """{
+				      "files": [
+					{
+					  "pattern": "${FILES_DIR}",
+					  "target": "${LOCAL_REPO1}",
+					  "recursive": "false"
+					}
+				     ]
+				    }"""
+			    )
         		rtPublishBuildInfo (
 				serverId: 'Artifactory',
 				buildName: "build2",
