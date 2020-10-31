@@ -71,7 +71,7 @@ pipeline {
     		//rtUpload(serverId: 'Artifactory')
 
 
-			    rtPublishBuildInfo (
+			    rtBuildInfo (
 
 				serverId: "Artifactory",
 				captureEnv: true
