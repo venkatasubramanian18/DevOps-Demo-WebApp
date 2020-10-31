@@ -84,8 +84,9 @@ pipeline {
 						rtMaven.resolver releaseRepo:'libs-release', snapshotRepo:'libs-snapshot', server: server
 						rtMaven.deployer.deployArtifacts = false // Disable artifacts deployment during Maven run
 						buildInfo = rtMaven.run pom: 'pom.xml', goals: 'clean install -e', buildInfo: buildInfo
-						server.publishBuildInfo buildInfo
+						server.publishBuildInfo buildInfo                				
 					}
+					jiraSendBuildInfo branch: 'DD-3', site: 'jira-devops18.atlassian.net'
 					slackSend channel: '#devops', tokenCredentialId: 'slacktoken', message: "Build Success and Stored in Artifact ${env.JOB_NAME} ${env.BUILD_NUMBER}"
 				}
 			}
@@ -122,7 +123,8 @@ pipeline {
 		steps{
 			script {
 				deploy adapters: [tomcat8(credentialsId: 'tomcat', path: '', url: 'http://23.101.207.158:8080/')], contextPath: '/QAWebapp', war: '**/*.war'	
-				slackSend channel: '#devops', tokenCredentialId: 'slacktoken', message: "Deployed to Test ${env.JOB_NAME} ${env.BUILD_NUMBER}"					
+				slackSend channel: '#devops', tokenCredentialId: 'slacktoken', message: "Deployed to Test ${env.JOB_NAME} ${env.BUILD_NUMBER}"	
+				jiraComment body: "Deploy to Test was successfull ${env.JOB_NAME} ${env.BUILD_NUMBER}", issueKey: 'DD-3'
 			}			
 		}
    	}	
@@ -147,6 +149,7 @@ pipeline {
 		steps{
 	     		deploy adapters: [tomcat8(credentialsId: 'tomcat', path: '', url: 'http://51.141.177.121:8080/')], contextPath: '/ProdWebapp', war: '**/*.war'	
 			slackSend channel: '#devops', tokenCredentialId: 'slacktoken', message: "Deployed to Prod ${env.JOB_NAME} ${env.BUILD_NUMBER}"	    
+			jiraComment body: "Deploy to Prod was successfull ${env.JOB_NAME} ${env.BUILD_NUMBER}", issueKey: 'DD-3'
 		}
 	}	
 	    
