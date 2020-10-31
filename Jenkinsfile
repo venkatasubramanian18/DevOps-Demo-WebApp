@@ -18,7 +18,7 @@ pipeline {
 //		slackSend channel: '#devops', tokenCredentialId: 'slacktoken', message: "Pipeline build ${env.JOB_NAME} ${env.BUILD_NUMBER} (<${env.BUILD_URL}|Open>)"
                 rtServer (
                    id: 'Artifactory',
-                   url: 'https://devops111.jfrog.io',
+                   url: 'https://devops111.jfrog.io/artifactory',
                    credentialsId: 'artifactory'
                 )
 		rtMavenResolver (
@@ -69,7 +69,11 @@ pipeline {
 //			    // If the build name and build number are not set here, the current job name and number will be used:
 			)			
 			rtUpload(serverId: 'Artifactory')
-        		rtPublishBuildInfo (serverId: 'Artifactory')
+        		rtPublishBuildInfo (
+				serverId: 'Artifactory',
+				buildName: buildName,
+				buildNumber: buildNumber
+			)
 //			slackSend channel: '#devops', tokenCredentialId: 'slacktoken', message: "Build Success ${env.JOB_NAME} ${env.BUILD_NUMBER}"
 		}
  	} 
