@@ -68,18 +68,19 @@ pipeline {
 			    deployerId: 'deployer-artifactory'
 //			    // If the build name and build number are not set here, the current job name and number will be used:
 			)			
-			//rtUpload(serverId: 'Artifactory')
+    		//rtUpload(serverId: 'Artifactory')
 
 
-//			    rtPublishBuildInfo (
-//
-//				serverId: "Artifactory",
+			    rtPublishBuildInfo (
+
+				serverId: "Artifactory",
+				captureEnv: true
 //
 //				buildName: "${env.JOB_NAME}",
 //
 //				buildNumber: "${env.BUILD_NUMBER}"
 //
-//			    )
+			    )
 //			slackSend channel: '#devops', tokenCredentialId: 'slacktoken', message: "Build Success ${env.JOB_NAME} ${env.BUILD_NUMBER}"
 		}
  	} 
