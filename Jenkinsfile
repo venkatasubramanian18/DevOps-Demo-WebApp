@@ -73,7 +73,6 @@ pipeline {
 
 			    rtBuildInfo (
 
-				serverId: "Artifactory",
 				captureEnv: true
 //
 //				buildName: "${env.JOB_NAME}",
