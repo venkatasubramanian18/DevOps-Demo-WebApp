@@ -69,25 +69,17 @@ pipeline {
 //			    // If the build name and build number are not set here, the current job name and number will be used:
 			)			
 			//rtUpload(serverId: 'Artifactory')
-			    rtUpload(
-				    serverId: 'Artifactory',
-				    buildName: "build2",
-				    buildNumber: "2",
-				    spec: """{
-				      "files": [
-					{
-					  "pattern": "${FILES_DIR}",
-					  "target": "${LOCAL_REPO1}",
-					  "recursive": "false"
-					}
-				     ]
-				    }"""
+
+
+			    rtPublishBuildInfo (
+
+				serverId: "Artifactory",
+
+				buildName: "${JOB_NAME}",
+
+				buildNumber: "${BUILD_NUMBER}"
+
 			    )
-        		rtPublishBuildInfo (
-				serverId: 'Artifactory',
-				buildName: "build2",
-				buildNumber: "2"
-			)
 //			slackSend channel: '#devops', tokenCredentialId: 'slacktoken', message: "Build Success ${env.JOB_NAME} ${env.BUILD_NUMBER}"
 		}
  	} 
