@@ -71,37 +71,37 @@ pipeline {
 			//rtUpload(serverId: 'Artifactory')
 
 
-			    rtPublishBuildInfo (
-
-				serverId: "Artifactory",
-
-				buildName: "${env.JOB_NAME}",
-
-				buildNumber: "${env.BUILD_NUMBER}"
-
-			    )
+//			    rtPublishBuildInfo (
+//
+//				serverId: "Artifactory",
+//
+//				buildName: "${env.JOB_NAME}",
+//
+//				buildNumber: "${env.BUILD_NUMBER}"
+//
+//			    )
 //			slackSend channel: '#devops', tokenCredentialId: 'slacktoken', message: "Build Success ${env.JOB_NAME} ${env.BUILD_NUMBER}"
 		}
  	} 
-//     	stage('Build') {
+     	stage('Build') {
 //		parallel{
 //			stage('Config, Build & Store Artifact') {
-//				steps {
-//					script {
-//						def server = Artifactory.server "artifactory"
-//						def rtMaven = Artifactory.newMavenBuild()
-//						def buildInfo = Artifactory.newBuildInfo()
-//						rtMaven.tool = "maven"
-//						rtMaven.deployer releaseRepo:'libs-release-local', snapshotRepo:'libs-snapshot-local', server: server
-//						rtMaven.resolver releaseRepo:'libs-release', snapshotRepo:'libs-snapshot', server: server
-//						rtMaven.deployer.deployArtifacts = false // Disable artifacts deployment during Maven run
-//						buildInfo = rtMaven.run pom: 'pom.xml', goals: 'clean install -e', buildInfo: buildInfo
-//						server.publishBuildInfo buildInfo                				
-//					}
+				steps {
+					script {
+						def server = Artifactory.server "artifactory"
+						def rtMaven = Artifactory.newMavenBuild()
+						def buildInfo = Artifactory.newBuildInfo()
+						rtMaven.tool = "maven"
+						rtMaven.deployer releaseRepo:'libs-release-local', snapshotRepo:'libs-snapshot-local', server: server
+						rtMaven.resolver releaseRepo:'libs-release', snapshotRepo:'libs-snapshot', server: server
+						rtMaven.deployer.deployArtifacts = false // Disable artifacts deployment during Maven run
+						buildInfo = rtMaven.run pom: 'pom.xml', goals: 'clean install -e', buildInfo: buildInfo
+						server.publishBuildInfo buildInfo                				
+					}
 //					jiraSendBuildInfo branch: 'DD-3', site: 'jira-devops18.atlassian.net'
 //					slackSend channel: '#devops', tokenCredentialId: 'slacktoken', message: "Build Success and Stored in Artifact ${env.JOB_NAME} ${env.BUILD_NUMBER}"
-//				}
-//			}
+				}
+			}
 // 			stage('Docker Image') {
 //				stages{
 //					stage('Build Docker Image') {
@@ -137,7 +137,14 @@ pipeline {
 				deploy adapters: [tomcat8(credentialsId: 'tomcat', path: '', url: 'http://23.101.207.158:8080/')], contextPath: '/QAWebapp', war: '**/*.war'	
 				slackSend channel: '#devops', tokenCredentialId: 'slacktoken', message: "Deployed to Test ${env.JOB_NAME} ${env.BUILD_NUMBER}"	
 				jiraComment body: "Deploy to Test was successfull ${env.JOB_NAME} ${env.BUILD_NUMBER}", issueKey: 'DD-3'
-			}			
+				
+			}
+
+		}
+		post {
+			always { 
+			jiraSendDeploymentInfo environmentId: 'Production', environmentName: 'Prod', serviceIds: [''], environmentType: 'production', site: 'jira-devops18.atlassian.net', state: 'successful'
+			}
 		}
    	}	
 //	stage('Perform UI Test - Publish Report') {
