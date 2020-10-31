@@ -165,7 +165,7 @@ pipeline {
 //			}
 //		}
 //	 }	 	    
-    }
+//    }
     post {
 	success {
 		echo 'All stages ran successfully'
