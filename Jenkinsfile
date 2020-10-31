@@ -13,31 +13,31 @@ pipeline {
     }
 	
     stages {	
-//        stage ('Artifactory configuration') {
-//            steps {
+        stage ('Artifactory configuration') {
+            steps {
 //		slackSend channel: '#devops', tokenCredentialId: 'slacktoken', message: "Pipeline build ${env.JOB_NAME} ${env.BUILD_NUMBER} (<${env.BUILD_URL}|Open>)"
-//                rtServer (
-//                   id: 'Artifactory',
-//                   url: 'https://devops111.jfrog.io',
-//                   credentialsId: 'artifactory'
-//                )
-//		rtMavenResolver (
-//		    id: 'resolver-artifactory',
-//		    serverId: 'Artifactory',
-//		    releaseRepo: 'libs-release',
-//		    snapshotRepo: 'libs-snapshot'
-//		)  
-//		rtMavenDeployer (
-//		    id: 'deployer-artifactory',
-//		    serverId: 'Artifactory',
-//		    deployArtifacts: false,
-//		    releaseRepo: 'libs-release-local',
-//		    snapshotRepo: 'libs-snapshot-local',
-//		    // By default, 3 threads are used to upload the artifacts to Artifactory. You can override this default by setting:
-//		    threads: 6
-//		)
-//            }	
-//	}			
+                rtServer (
+                   id: 'Artifactory',
+                   url: 'https://devops111.jfrog.io',
+                   credentialsId: 'artifactory'
+                )
+		rtMavenResolver (
+		    id: 'resolver-artifactory',
+		    serverId: 'Artifactory',
+		    releaseRepo: 'libs-release',
+		    snapshotRepo: 'libs-snapshot'
+		)  
+		rtMavenDeployer (
+		    id: 'deployer-artifactory',
+		    serverId: 'Artifactory',
+		    deployArtifacts: false,
+		    releaseRepo: 'libs-release-local',
+		    snapshotRepo: 'libs-snapshot-local',
+		    // By default, 3 threads are used to upload the artifacts to Artifactory. You can override this default by setting:
+		    threads: 6
+		)
+            }	
+	}			
         stage('SCM - GIT Commit') {
             steps {
                 // Get some code from a GitHub repository
@@ -53,44 +53,46 @@ pipeline {
 //			slackSend channel: '#devops', tokenCredentialId: 'slacktoken', message: "SonarQube Analysis Succeed ${env.JOB_NAME} ${env.BUILD_NUMBER} (<${env.BUILD_URL}|Open>)"
 //		}
 //	}
-//	stage('Build - Maven') {
-//		steps {
+	stage('Build - Maven') {
+		steps {
 //			sh 'mvn clean install'
-//			rtMavenRun (
-//			    // Tool name from Jenkins configuration.
-//			    tool: 'maven',
-//			    pom: 'pom.xml',
-//			    goals: 'clean install -e -o',
-//			    //goals: 'clean install',
-//			    // Maven options.
-//			    opts: '-Xms1024m -Xmx4096m',
-//			    resolverId: 'resolver-artifactory',
-//			    deployerId: 'deployer-artifactory'
+			rtMavenRun (
+			    // Tool name from Jenkins configuration.
+			    tool: 'maven',
+			    pom: 'pom.xml',
+			    goals: 'clean install -e -o',
+			    //goals: 'clean install',
+			    // Maven options.
+			    opts: '-Xms1024m -Xmx4096m',
+			    resolverId: 'resolver-artifactory',
+			    deployerId: 'deployer-artifactory'
 //			    // If the build name and build number are not set here, the current job name and number will be used:
-//			)			
+			)			
+			rtUpload(serverId: 'Artifactory')
+        		rtPublishBuildInfo (serverId: 'Artifactory')
 //			slackSend channel: '#devops', tokenCredentialId: 'slacktoken', message: "Build Success ${env.JOB_NAME} ${env.BUILD_NUMBER}"
-//		}
-// 	} 
-     	stage('Build') {
-		parallel{
-			stage('Config, Build & Store Artifact') {
-				steps {
-					script {
-						def server = Artifactory.server "artifactory"
-						def rtMaven = Artifactory.newMavenBuild()
-						def buildInfo = Artifactory.newBuildInfo()
-						rtMaven.tool = "maven"
-						rtMaven.deployer releaseRepo:'libs-release-local', snapshotRepo:'libs-snapshot-local', server: server
-						rtMaven.resolver releaseRepo:'libs-release', snapshotRepo:'libs-snapshot', server: server
-						rtMaven.deployer.deployArtifacts = false // Disable artifacts deployment during Maven run
-						buildInfo = rtMaven.run pom: 'pom.xml', goals: 'clean install -e', buildInfo: buildInfo
-						server.publishBuildInfo buildInfo                				
-					}
-					jiraSendBuildInfo branch: 'DD-3', site: 'jira-devops18.atlassian.net'
-					slackSend channel: '#devops', tokenCredentialId: 'slacktoken', message: "Build Success and Stored in Artifact ${env.JOB_NAME} ${env.BUILD_NUMBER}"
-				}
-			}
-			stage('Docker Image') {
+		}
+ 	} 
+//     	stage('Build') {
+//		parallel{
+//			stage('Config, Build & Store Artifact') {
+//				steps {
+//					script {
+//						def server = Artifactory.server "artifactory"
+//						def rtMaven = Artifactory.newMavenBuild()
+//						def buildInfo = Artifactory.newBuildInfo()
+//						rtMaven.tool = "maven"
+//						rtMaven.deployer releaseRepo:'libs-release-local', snapshotRepo:'libs-snapshot-local', server: server
+//						rtMaven.resolver releaseRepo:'libs-release', snapshotRepo:'libs-snapshot', server: server
+//						rtMaven.deployer.deployArtifacts = false // Disable artifacts deployment during Maven run
+//						buildInfo = rtMaven.run pom: 'pom.xml', goals: 'clean install -e', buildInfo: buildInfo
+//						server.publishBuildInfo buildInfo                				
+//					}
+//					jiraSendBuildInfo branch: 'DD-3', site: 'jira-devops18.atlassian.net'
+//					slackSend channel: '#devops', tokenCredentialId: 'slacktoken', message: "Build Success and Stored in Artifact ${env.JOB_NAME} ${env.BUILD_NUMBER}"
+//				}
+//			}
+ 			stage('Docker Image') {
 				stages{
 					stage('Build Docker Image') {
 						steps {
