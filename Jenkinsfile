@@ -71,8 +71,8 @@ pipeline {
 			rtUpload(serverId: 'Artifactory')
         		rtPublishBuildInfo (
 				serverId: 'Artifactory',
-				buildName: buildName,
-				buildNumber: buildNumber
+				buildName: "build2",
+				buildNumber: "2"
 			)
 //			slackSend channel: '#devops', tokenCredentialId: 'slacktoken', message: "Build Success ${env.JOB_NAME} ${env.BUILD_NUMBER}"
 		}
