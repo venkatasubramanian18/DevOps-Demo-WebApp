@@ -74,7 +74,7 @@ pipeline {
 			    // If the build name and build number are not set here, the current job name and number will be used:
 			)			
     			//rtUpload(serverId: 'Artifactory')
-			slackSend channel: SlackChannel', tokenCredentialId: 'slacktoken', message: "Build Success ${env.JOB_NAME} ${env.BUILD_NUMBER}"
+			slackSend channel: SlackChannel, tokenCredentialId: 'slacktoken', message: "Build Success ${env.JOB_NAME} ${env.BUILD_NUMBER}"
 		}
  	} 
     	stage('Deploy to Test') {
