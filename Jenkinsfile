@@ -6,6 +6,7 @@ pipeline {
 	dockerImage = ''
 	JfrogURL = 'https://devops111.jfrog.io/artifactory'
 	JfrogLogin = 'artifactory'
+	rtServerID = 'Artifactory'
 	GitHubURL = 'git@github.com:venkatasubramanian18/DevOps-Demo-WebApp.git'
 	GitHubLogin = 'github'
 	SlackChannel = '#devops'
@@ -22,19 +23,19 @@ pipeline {
             steps {
 //		slackSend channel: '#devops', tokenCredentialId: 'slacktoken', message: "Pipeline build ${env.JOB_NAME} ${env.BUILD_NUMBER} (<${env.BUILD_URL}|Open>)"
                 rtServer (
-                   id: 'Artifactory',
+                   id: rtServerID,
                    url: JfrogURL,
                    credentialsId: JfrogLogin
                 )
 		rtMavenResolver (
 		    id: 'resolver-artifactory',
-		    serverId: 'Artifactory',
+		    serverId: rtServerID,
 		    releaseRepo: 'libs-release',
 		    snapshotRepo: 'libs-snapshot'
 		)  
 		rtMavenDeployer (
 		    id: 'deployer-artifactory',
-		    serverId: 'Artifactory',
+		    serverId: rtServerID,
 		    deployArtifacts: false,
 		    releaseRepo: 'libs-release-local',
 		    snapshotRepo: 'libs-snapshot-local',
