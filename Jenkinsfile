@@ -90,7 +90,7 @@ pipeline {
 		}
 		post {
 			always { 
-			jiraSendDeploymentInfo environmentId: 'Production', environmentName: 'Prod', serviceIds: [''], environmentType: 'production', site: 'jira-devops18.atlassian.net', state: 'successful'
+			jiraSendDeploymentInfo environmentId: 'Test', environmentName: 'Test', serviceIds: [''], environmentType: 'testing', site: 'jira-devops18.atlassian.net', state: 'successful'
 			}
 		}
    	}	    
@@ -154,6 +154,11 @@ pipeline {
 			slackSend channel: SlackChannel, tokenCredentialId: SlackToken, message: "Deployed to Prod ${env.JOB_NAME} ${env.BUILD_NUMBER}"	    
 			jiraComment body: "Deploy to Prod was successfull ${env.JOB_NAME} ${env.BUILD_NUMBER}", issueKey: 'DD-3'
 		}
+		post {
+			always { 
+				jiraSendDeploymentInfo environmentId: 'Prod', environmentName: 'Production', serviceIds: [''], environmentType: 'production', site: 'jira-devops18.atlassian.net', state: 'successful'
+			}
+		}		
 	}	
 	    
 	stage('Perform Sanity Test - Publish Report') {
