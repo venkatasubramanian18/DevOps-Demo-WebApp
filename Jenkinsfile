@@ -4,13 +4,6 @@ pipeline {
 	registry = "devopstraining18/mavenbuild"
 	registryCredential = 'dockerhub'
 	dockerImage = ''
-	JfrogURL = 'https://devops111.jfrog.io/artifactory'
-	JfrogLogin = 'artifactory'
-	rtServerID = 'Artifactory'
-	GitHubURL = 'git@github.com:venkatasubramanian18/DevOps-Demo-WebApp.git'
-	GitHubLogin = 'github'
-	SlackChannel = '#devops'
-	SlackToken = 'slacktoken'
     }	
 	
     agent any
@@ -24,19 +17,19 @@ pipeline {
             steps {
 //		slackSend channel: '#devops', tokenCredentialId: 'slacktoken', message: "Pipeline build ${env.JOB_NAME} ${env.BUILD_NUMBER} (<${env.BUILD_URL}|Open>)"
                 rtServer (
-                   id: rtServerID,
-                   url: JfrogURL,
-                   credentialsId: JfrogLogin
+                   id: 'Artifactory',
+                   url: 'https://devops111.jfrog.io/artifactory',
+                   credentialsId: 'artifactory'
                 )
 		rtMavenResolver (
 		    id: 'resolver-artifactory',
-		    serverId: rtServerID,
+		    serverId: 'Artifactory',
 		    releaseRepo: 'libs-release',
 		    snapshotRepo: 'libs-snapshot'
 		)  
 		rtMavenDeployer (
 		    id: 'deployer-artifactory',
-		    serverId: rtServerID,
+		    serverId: 'Artifactory',
 		    deployArtifacts: false,
 		    releaseRepo: 'libs-release-local',
 		    snapshotRepo: 'libs-snapshot-local',
@@ -48,21 +41,21 @@ pipeline {
         stage('SCM - GIT Commit') {
             steps {
                 // Get some code from a GitHub repository
-                git credentialsId: GitHubLogin, url: GitHubURL	
-		slackSend channel: SlackChannel, tokenCredentialId: SlackToken, message: "Pipeline build Started ${env.JOB_NAME} ${env.BUILD_NUMBER} (<${env.BUILD_URL}|Open>)"
+                git credentialsId: 'github', url: 'git@github.com:venkatasubramanian18/DevOps-Demo-WebApp.git'	
+		slackSend channel: '#devops', tokenCredentialId: 'slacktoken', message: "Pipeline build Started ${env.JOB_NAME} ${env.BUILD_NUMBER} (<${env.BUILD_URL}|Open>)"
             }
         }
-//        stage('Code Analysis - SonarQube') {
+//       stage('Code Analysis - SonarQube') {
 //		steps {
 //			withSonarQubeEnv(credentialsId: 'sonar', installationName: 'sonarqube') { 
 //				sh 'mvn clean package sonar:sonar -Dsonar.host.url=http://23.100.47.167:9000 -Dsonar.sources=. -Dsonar.tests=. -Dsonar.inclusions=**/test/java/servlet/createpage_junit.java -Dsonar.test.exclusions=**/test/java/servlet/createpage_junit.java -Dsonar.login=admin -Dsonar.password=admin'
 //			}
-//			slackSend channel: SlackChannel, tokenCredentialId: SlackToken, message: "SonarQube Analysis Succeed ${env.JOB_NAME} ${env.BUILD_NUMBER} (<${env.BUILD_URL}|Open>)"
+//			slackSend channel: '#devops', tokenCredentialId: 'slacktoken', message: "SonarQube Analysis Succeed ${env.JOB_NAME} ${env.BUILD_NUMBER} (<${env.BUILD_URL}|Open>)"
 //		}
 //	}
 	stage('Build - Maven') {
 		steps {
-			//sh 'mvn clean install'
+//			sh 'mvn clean install'
 			rtMavenRun (
 			    // Tool name from Jenkins configuration.
 			    tool: 'maven',
@@ -73,18 +66,79 @@ pipeline {
 			    opts: '-Xms1024m -Xmx4096m',
 			    resolverId: 'resolver-artifactory',
 			    deployerId: 'deployer-artifactory'
-			    // If the build name and build number are not set here, the current job name and number will be used:
+//			    // If the build name and build number are not set here, the current job name and number will be used:
 			)			
-    			//rtUpload(serverId: 'Artifactory')
-			slackSend channel: SlackChannel, tokenCredentialId: SlackToken, message: "Build Success ${env.JOB_NAME} ${env.BUILD_NUMBER}"
+    		//rtUpload(serverId: 'Artifactory')
+
+
+			    rtBuildInfo (
+
+				serverId: "Artifactory",
+				captureEnv: true
+//
+//				buildName: "${env.JOB_NAME}",
+//
+//				buildNumber: "${env.BUILD_NUMBER}"
+//
+			    )
+//			slackSend channel: '#devops', tokenCredentialId: 'slacktoken', message: "Build Success ${env.JOB_NAME} ${env.BUILD_NUMBER}"
 		}
  	} 
+     	stage('Build') {
+//		parallel{
+//			stage('Config, Build & Store Artifact') {
+				steps {
+					script {
+						def server = Artifactory.server "artifactory"
+						def rtMaven = Artifactory.newMavenBuild()
+						def buildInfo = Artifactory.newBuildInfo()
+						rtMaven.tool = "maven"
+						rtMaven.deployer releaseRepo:'libs-release-local', snapshotRepo:'libs-snapshot-local', server: server
+						rtMaven.resolver releaseRepo:'libs-release', snapshotRepo:'libs-snapshot', server: server
+						rtMaven.deployer.deployArtifacts = false // Disable artifacts deployment during Maven run
+						buildInfo = rtMaven.run pom: 'pom.xml', goals: 'clean install -e', buildInfo: buildInfo
+						server.publishBuildInfo buildInfo                				
+					}
+//					jiraSendBuildInfo branch: 'DD-3', site: 'jira-devops18.atlassian.net'
+//					slackSend channel: '#devops', tokenCredentialId: 'slacktoken', message: "Build Success and Stored in Artifact ${env.JOB_NAME} ${env.BUILD_NUMBER}"
+				}
+			}
+// 			stage('Docker Image') {
+//				stages{
+//					stage('Build Docker Image') {
+//						steps {
+//							script {
+//								dockerImage = docker.build registry + ":$BUILD_NUMBER"
+//							}							
+//						}
+//					}
+//					stage('Push Docker Image') {
+//						steps {
+//							script {
+//								docker.withRegistry( '', registryCredential ) {
+//									dockerImage.push()
+//								}
+//							}
+//							slackSend channel: '#devops', tokenCredentialId: 'slacktoken', message: "Docker Image Push Success ${env.JOB_NAME} ${env.BUILD_NUMBER}"
+//						}
+//					}	
+//					stage('Cleanup server space') {
+//						steps{
+//							sh "docker rmi $registry:$BUILD_NUMBER"
+//						}
+//					}					
+//				}
+//			}				
+//		}	
+//	}    	    
+	  	    				
     	stage('Deploy to Test') {
 		steps{
 			script {
 				deploy adapters: [tomcat8(credentialsId: 'tomcat', path: '', url: 'http://23.101.207.158:8080/')], contextPath: '/QAWebapp', war: '**/*.war'	
-				slackSend channel: SlackChannel, tokenCredentialId: SlackToken, message: "Deployed to Test ${env.JOB_NAME} ${env.BUILD_NUMBER}"	
-				jiraComment body: "Deploy to Test was successfull ${env.JOB_NAME} ${env.BUILD_NUMBER}", issueKey: 'DD-3'				
+				slackSend channel: '#devops', tokenCredentialId: 'slacktoken', message: "Deployed to Test ${env.JOB_NAME} ${env.BUILD_NUMBER}"	
+				jiraComment body: "Deploy to Test was successfull ${env.JOB_NAME} ${env.BUILD_NUMBER}", issueKey: 'DD-3'
+				
 			}
 
 		}
@@ -93,88 +147,49 @@ pipeline {
 			jiraSendDeploymentInfo environmentId: 'Production', environmentName: 'Prod', serviceIds: [''], environmentType: 'production', site: 'jira-devops18.atlassian.net', state: 'successful'
 			}
 		}
-   	}	    
-     	stage('Artifact & Docker') {
-		parallel{
-			stage('Store Artifact') {
-				steps{
-					rtBuildInfo (
-						captureEnv: true
-					)
-				 }
-			}
- 			stage('Docker Image') {
-				stages{
-					stage('Build Docker Image') {
-						steps {
-							script {
-								dockerImage = docker.build registry + ":$BUILD_NUMBER"
-							}							
-						}
-					}
-					stage('Push Docker Image') {
-						steps {
-							script {
-								docker.withRegistry( '', registryCredential ) {
-									dockerImage.push()
-								}
-							}
-							slackSend channel: SlackChannel, tokenCredentialId: SlackToken, message: "Docker Image Push Success ${env.JOB_NAME} ${env.BUILD_NUMBER}"
-						}
-					}	
-					stage('Cleanup server space') {
-						steps{
-							sh "docker rmi $registry:$BUILD_NUMBER"
-						}
-					}					
-				}
-			}						
-		}
-	}	
-	stage('Perform UI Test - Publish Report') {
-		steps{
-			script {
-			  sh 'mvn -f functionaltest/pom.xml package'
-			  sh 'mvn package test'
-			  publishHTML([allowMissing: false, alwaysLinkToLastBuild: false, keepAll: false, reportDir: '\\functionaltest\\target\\surefire-reports', reportFiles: 'index.html', reportName: 'UI Test Report', reportTitles: ''])
-			}
-		}
-	}
+   	}	
+//	stage('Perform UI Test - Publish Report') {
+//		steps{
+//			script {
+//			  sh 'mvn -f functionaltest/pom.xml package'
+//			  sh 'mvn package test'
+//			  publishHTML([allowMissing: false, alwaysLinkToLastBuild: false, keepAll: false, reportDir: '\\functionaltest\\target\\surefire-reports', reportFiles: 'index.html', reportName: 'UI Test Report', reportTitles: ''])
+//			}
+//		}
+//	}
 	    
 //	stage('Performance Test - Blazemeter') {
 //		steps{
 //	   		blazeMeterTest credentialsId: 'Blazemeter', testId: '8626535.taurus', workspaceId: '677291'
-//	    		slackSend channel: SlackChannel, tokenCredentialId: SlackToken, message: "Performance Test - Blazemeter ${env.JOB_NAME} ${env.BUILD_NUMBER}"
+//	    		slackSend channel: '#devops', tokenCredentialId: 'slacktoken', message: "Performance Test - Blazemeter ${env.JOB_NAME} ${env.BUILD_NUMBER}"
 //		}
 //	}	  
 
-	stage('Deploy to Production') {
+	stage('Deploy to Prod') {
 		steps{
 	     		deploy adapters: [tomcat8(credentialsId: 'tomcat', path: '', url: 'http://51.141.177.121:8080/')], contextPath: '/ProdWebapp', war: '**/*.war'	
-			slackSend channel: SlackChannel, tokenCredentialId: SlackToken, message: "Deployed to Prod ${env.JOB_NAME} ${env.BUILD_NUMBER}"	    
+			slackSend channel: '#devops', tokenCredentialId: 'slacktoken', message: "Deployed to Prod ${env.JOB_NAME} ${env.BUILD_NUMBER}"	    
 			jiraComment body: "Deploy to Prod was successfull ${env.JOB_NAME} ${env.BUILD_NUMBER}", issueKey: 'DD-3'
 		}
 	}	
 	    
-	stage('Perform Sanity Test - Publish Report') {
-		steps{
-			script {
-			     sh 'mvn -f Acceptancetest/pom.xml package'
-			     sh 'mvn package test'
-			     publishHTML([allowMissing: false, alwaysLinkToLastBuild: false, keepAll: false, reportDir: '\\Acceptancetest\\target\\surefire-reports', reportFiles: 'index.html', reportName: 'Sanity Test Report', reportTitles: ''])
-			     slackSend channel: SlackChannel, tokenCredentialId: SlackToken, message: "Perform Sanity Test - Publish Report ${env.JOB_NAME} ${env.BUILD_NUMBER}"
-			}
-		}
-	 }	 	    
+//	stage('Perform Sanity Test - Publish Report') {
+//		steps{
+//			script {
+//			     sh 'mvn -f Acceptancetest/pom.xml package'
+//			     sh 'mvn package test'
+//			     publishHTML([allowMissing: false, alwaysLinkToLastBuild: false, keepAll: false, reportDir: '\\Acceptancetest\\target\\surefire-reports', reportFiles: 'index.html', reportName: 'Sanity Test Report', reportTitles: ''])
+//			     slackSend channel: '#devops', tokenCredentialId: 'slacktoken', message: "Perform Sanity Test - Publish Report ${env.JOB_NAME} ${env.BUILD_NUMBER}"
+//			}
+//		}
+//	 }	 	    
     }
     post {
 	success {
 		echo 'All stages ran successfully'
-		slackSend channel: SlackChannel, tokenCredentialId: SlackToken, message: "All Stages ran successfully ${env.JOB_NAME} ${env.BUILD_NUMBER}"
 	}
 	failure {
 		echo 'Failed in some stage'
-		slackSend channel: SlackChannel, tokenCredentialId: SlackToken, message: "Failed in some stage ${env.JOB_NAME} ${env.BUILD_NUMBER}"
 	}
     }
 }
