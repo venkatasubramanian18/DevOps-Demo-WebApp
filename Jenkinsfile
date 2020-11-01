@@ -100,6 +100,7 @@ pipeline {
 					rtBuildInfo (
 						captureEnv: true
 					)
+				 }
 			}
  			stage('Docker Image') {
 				stages{
@@ -175,5 +176,4 @@ pipeline {
 		slackSend channel: SlackChannel, tokenCredentialId: 'slacktoken', message: "Failed in some stage ${env.JOB_NAME} ${env.BUILD_NUMBER}"
 	}
     }
-}
 }
