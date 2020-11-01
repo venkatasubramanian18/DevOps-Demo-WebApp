@@ -72,14 +72,7 @@ pipeline {
 
 
 			    rtBuildInfo (
-
-				serverId: "Artifactory",
 				captureEnv: true
-//
-//				buildName: "${env.JOB_NAME}",
-//
-//				buildNumber: "${env.BUILD_NUMBER}"
-//
 			    )
 //			slackSend channel: '#devops', tokenCredentialId: 'slacktoken', message: "Build Success ${env.JOB_NAME} ${env.BUILD_NUMBER}"
 		}
