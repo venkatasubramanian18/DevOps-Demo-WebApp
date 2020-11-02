@@ -93,44 +93,51 @@ pipeline {
 			jiraSendDeploymentInfo environmentId: 'Test', environmentName: 'Test', serviceIds: [''], environmentType: 'testing', site: 'jira-devops18.atlassian.net', state: 'successful'
 			}
 		}
-   	}	    
-     	stage('Artifact & Docker') {
-		parallel{
-			stage('Store Artifact') {
-				steps{
-					rtBuildInfo (
-						captureEnv: true
-					)
-				 }
-			}
- 			stage('Docker Image') {
-				stages{
-					stage('Build Docker Image') {
-						steps {
-							script {
-								dockerImage = docker.build registry + ":$BUILD_NUMBER"
-							}							
-						}
-					}
-					stage('Push Docker Image') {
-						steps {
-							script {
-								docker.withRegistry( '', registryCredential ) {
-									dockerImage.push()
-								}
-							}
-							slackSend channel: SlackChannel, tokenCredentialId: SlackToken, message: "Docker Image Push Success ${env.JOB_NAME} ${env.BUILD_NUMBER}"
-						}
-					}	
-					stage('Cleanup server space') {
-						steps{
-							sh "docker rmi $registry:$BUILD_NUMBER"
-						}
-					}					
-				}
-			}						
+   	}
+	stage('Store Artifact') {
+		steps{
+			rtBuildInfo (
+				captureEnv: true
+			)
 		}
-	}		    
+	}
+//     	stage('Artifact & Docker') {
+//		parallel{
+//			stage('Store Artifact') {
+//				steps{
+//					rtBuildInfo (
+//						captureEnv: true
+//					)
+//				 }
+//			}
+//			stage('Docker Image') {
+//				stages{
+//					stage('Build Docker Image') {
+//						steps {
+//							script {
+//								dockerImage = docker.build registry + ":$BUILD_NUMBER"
+//							}							
+//						}
+//					}
+//					stage('Push Docker Image') {
+//						steps {
+//							script {
+//								docker.withRegistry( '', registryCredential ) {
+//									dockerImage.push()
+//								}
+//							}
+//							slackSend channel: SlackChannel, tokenCredentialId: SlackToken, message: "Docker Image Push Success ${env.JOB_NAME} ${env.BUILD_NUMBER}"
+//						}
+//					}	
+//					stage('Cleanup server space') {
+//						steps{
+//							sh "docker rmi $registry:$BUILD_NUMBER"
+//						}
+//					}					
+//				}
+//			}						
+//		}
+//	}		    
 	stage('Perform UI Test - Publish Report') {
 		steps{
 			script {
@@ -162,18 +169,44 @@ pipeline {
 					}
 				}
 			}
-		        stage('Kubernetes Deploy'){
-				steps{
-					sh 'ls -ltr'
-					sh 'pwd'
-					sh "sed -i 's/tagversion/${env.BUILD_ID}/g' deployment.yaml"			
-					step([$class: 'KubernetesEngineBuilder', 
-						projectId: 'devops-294021',
-						clusterName: "k8scluster",
-						zone: "us-west2-a",
-						manifestPattern: 'deployment.yaml',
-						credentialsId: "k8saccount",
-						verifyDeployments: true])
+		        stage('Docker & Kubernetes'){
+				stages{
+					stage('Build Docker Image') {
+						steps {
+							script {
+								dockerImage = docker.build registry + ":$BUILD_NUMBER"
+							}							
+						}
+					}
+					stage('Push Docker Image') {
+						steps {
+							script {
+								docker.withRegistry( '', registryCredential ) {
+									dockerImage.push()
+								}
+							}
+							slackSend channel: SlackChannel, tokenCredentialId: SlackToken, message: "Docker Image Push Success ${env.JOB_NAME} ${env.BUILD_NUMBER}"
+						}
+					}	
+					stage('Cleanup server space') {
+						steps{
+							sh "docker rmi $registry:$BUILD_NUMBER"
+						}
+					}					
+					stage('Kubernetes Deploy') {
+						steps{
+							sh 'ls -ltr'
+							sh 'pwd'
+							sh "sed -i 's/tagversion/${env.BUILD_ID}/g' deployment.yaml"			
+							step([$class: 'KubernetesEngineBuilder', 
+								projectId: 'devops-294021',
+								clusterName: "k8scluster",
+								zone: "us-west2-a",
+								manifestPattern: 'deployment.yaml',
+								credentialsId: "k8saccount",
+								verifyDeployments: true])
+						}
+					}
 				}
 			}
         	}
