@@ -76,6 +76,7 @@ pipeline {
 			    // If the build name and build number are not set here, the current job name and number will be used:
 			)			
     			//rtUpload(serverId: 'Artifactory')
+			jiraSendBuildInfo branch: 'DD-3', site: 'jira-devops18.atlassian.net'
 			slackSend channel: SlackChannel, tokenCredentialId: SlackToken, message: "Build Success ${env.JOB_NAME} ${env.BUILD_NUMBER}"
 		}
  	} 
@@ -101,43 +102,6 @@ pipeline {
 			)
 		}
 	}
-//     	stage('Artifact & Docker') {
-//		parallel{
-//			stage('Store Artifact') {
-//				steps{
-//					rtBuildInfo (
-//						captureEnv: true
-//					)
-//				 }
-//			}
-//			stage('Docker Image') {
-//				stages{
-//					stage('Build Docker Image') {
-//						steps {
-//							script {
-//								dockerImage = docker.build registry + ":$BUILD_NUMBER"
-//							}							
-//						}
-//					}
-//					stage('Push Docker Image') {
-//						steps {
-//							script {
-//								docker.withRegistry( '', registryCredential ) {
-//									dockerImage.push()
-//								}
-//							}
-//							slackSend channel: SlackChannel, tokenCredentialId: SlackToken, message: "Docker Image Push Success ${env.JOB_NAME} ${env.BUILD_NUMBER}"
-//						}
-//					}	
-//					stage('Cleanup server space') {
-//						steps{
-//							sh "docker rmi $registry:$BUILD_NUMBER"
-//						}
-//					}					
-//				}
-//			}						
-//		}
-//	}		    
 	stage('Perform UI Test - Publish Report') {
 		steps{
 			script {
