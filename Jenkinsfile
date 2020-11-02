@@ -130,21 +130,7 @@ pipeline {
 				}
 			}						
 		}
-	}	
-        stage('Kubernetes Deploy'){
-		steps{
-		   	sh 'ls -ltr'
-		   	sh 'pwd'
-		   	sh "sed -i 's/tagversion/${env.BUILD_ID}/g' deployment.yaml"			
-			step([$class: 'KubernetesEngineBuilder', 
-				projectId: 'devops-294021',
-				clusterName: "k8scluster",
-				zone: "us-west2-a",
-				manifestPattern: 'deployment.yaml',
-				credentialsId: "k8saccount",
-				verifyDeployments: true])
-		}
-        }	    
+	}		    
 	stage('Perform UI Test - Publish Report') {
 		steps{
 			script {
@@ -163,16 +149,34 @@ pipeline {
 //	}	  
 
 	stage('Deploy to Production') {
-		steps{
-	     		deploy adapters: [tomcat8(credentialsId: 'tomcat', path: '', url: 'http://51.141.177.121:8080/')], contextPath: '/ProdWebapp', war: '**/*.war'	
-			slackSend channel: SlackChannel, tokenCredentialId: SlackToken, message: "Deployed to Prod ${env.JOB_NAME} ${env.BUILD_NUMBER}"	    
-			jiraComment body: "Deploy to Prod was successfull ${env.JOB_NAME} ${env.BUILD_NUMBER}", issueKey: 'DD-3'
-		}
-		post {
-			always { 
-				jiraSendDeploymentInfo environmentId: 'Prod', environmentName: 'Production', serviceIds: [''], environmentType: 'production', site: 'jira-devops18.atlassian.net', state: 'successful'
+		parallel{
+			stage('Prod Server Deploy') {		
+				steps{
+					deploy adapters: [tomcat8(credentialsId: 'tomcat', path: '', url: 'http://51.141.177.121:8080/')], contextPath: '/ProdWebapp', war: '**/*.war'	
+					slackSend channel: SlackChannel, tokenCredentialId: SlackToken, message: "Deployed to Prod ${env.JOB_NAME} ${env.BUILD_NUMBER}"	    
+					jiraComment body: "Deploy to Prod was successfull ${env.JOB_NAME} ${env.BUILD_NUMBER}", issueKey: 'DD-3'
+				}
+				post {
+					always { 
+						jiraSendDeploymentInfo environmentId: 'Prod', environmentName: 'Production', serviceIds: [''], environmentType: 'production', site: 'jira-devops18.atlassian.net', state: 'successful'
+					}
+				}
 			}
-		}		
+		        stage('Kubernetes Deploy'){
+				steps{
+					sh 'ls -ltr'
+					sh 'pwd'
+					sh "sed -i 's/tagversion/${env.BUILD_ID}/g' deployment.yaml"			
+					step([$class: 'KubernetesEngineBuilder', 
+						projectId: 'devops-294021',
+						clusterName: "k8scluster",
+						zone: "us-west2-a",
+						manifestPattern: 'deployment.yaml',
+						credentialsId: "k8saccount",
+						verifyDeployments: true])
+				}
+			}
+        	}
 	}	
 	    
 	stage('Perform Sanity Test - Publish Report') {
