@@ -157,18 +157,6 @@ pipeline {
 
 	stage('Deploy to Production') {
 		parallel{
-			stage('Prod Server Deploy') {		
-				steps{
-					deploy adapters: [tomcat8(credentialsId: 'tomcat', path: '', url: 'http://51.141.177.121:8080/')], contextPath: '/ProdWebapp', war: '**/*.war'	
-					slackSend channel: SlackChannel, tokenCredentialId: SlackToken, message: "Deployed to Prod ${env.JOB_NAME} ${env.BUILD_NUMBER}"	    
-					jiraComment body: "Deploy to Prod was successfull ${env.JOB_NAME} ${env.BUILD_NUMBER}", issueKey: 'DD-3'
-				}
-				post {
-					always { 
-						jiraSendDeploymentInfo environmentId: 'Prod', environmentName: 'Production', serviceIds: [''], environmentType: 'production', site: 'jira-devops18.atlassian.net', state: 'successful'
-					}
-				}
-			}
 		        stage('Docker & Kubernetes'){
 				stages{
 					stage('Build Docker Image') {
@@ -209,6 +197,18 @@ pipeline {
 					}
 				}
 			}
+			stage('Prod Server Deploy') {		
+				steps{
+					deploy adapters: [tomcat8(credentialsId: 'tomcat', path: '', url: 'http://51.141.177.121:8080/')], contextPath: '/ProdWebapp', war: '**/*.war'	
+					slackSend channel: SlackChannel, tokenCredentialId: SlackToken, message: "Deployed to Prod ${env.JOB_NAME} ${env.BUILD_NUMBER}"	    
+					jiraComment body: "Deploy to Prod was successfull ${env.JOB_NAME} ${env.BUILD_NUMBER}", issueKey: 'DD-3'
+				}
+				post {
+					always { 
+						jiraSendDeploymentInfo environmentId: 'Prod', environmentName: 'Production', serviceIds: [''], environmentType: 'production', site: 'jira-devops18.atlassian.net', state: 'successful'
+					}
+				}
+			}			
         	}
 	}	
 	    
