@@ -131,6 +131,15 @@ pipeline {
 			}						
 		}
 	}	
+        teps{
+                step([$class: 'KubernetesEngineBuilder', 
+                        projectId: "my-project-id",
+                        clusterName: "k8scluster",
+                        zone: "us-west2-a",
+                        manifestPattern: 'deployment.yaml',
+                        credentialsId: "gke-service-account",
+                        verifyDeployments: true])
+        }	    
 	stage('Perform UI Test - Publish Report') {
 		steps{
 			script {
