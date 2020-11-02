@@ -1,0 +1,35 @@
+---
+apiVersion: v1
+kind: Deployment
+metadata:
+  name: devopsapp
+spec:
+  replicas: 3
+  selector:
+   matchLabels:
+    app: devopsapp
+  template:
+    metadata:
+      labels:
+        app: devopsapp
+    spec:
+      containers:
+      - name: devopsapp
+        image: devopstraining18/mavenbuild:tagversion
+        ports:
+        - containerPort: 8080
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: wdevopsapp-service
+  labels:
+    app: devopsapp
+spec:
+  type: LoadBalancer
+  selector:
+    app: devopsapp
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 8080
