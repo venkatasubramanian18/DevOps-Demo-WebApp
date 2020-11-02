@@ -131,7 +131,7 @@ pipeline {
 			}						
 		}
 	}	
-        stage{
+        stage('Kubernetes Deploy'){
 		steps{
 		   	sh 'ls -ltr'
 		   	sh 'pwd'
