@@ -74,9 +74,13 @@ pipeline {
 			    //opts: '-Xms1024m -Xmx4096m',
 			    resolverId: 'resolver-artifactory',
 			    deployerId: 'deployer-artifactory',
-			    opts: '-Dartifactory.publish.artifacts=true -Dartifactory.publish.buildInfo=true'
+			    //opts: '-Dartifactory.publish.artifacts=true -Dartifactory.publish.buildInfo=true'
+			    opts: '-Dartifactory.publish.buildInfo=true'
 			    // If the build name and build number are not set here, the current job name and number will be used:
-			)				
+			)	
+			rtPublishBuildInfo (
+			    serverId: 'Artifactory',			
+			)			
     			//rtUpload(serverId: 'Artifactory')
 			jiraSendBuildInfo branch: 'DD-3', site: 'jira-devops18.atlassian.net'
 			slackSend channel: SlackChannel, tokenCredentialId: SlackToken, message: "Build Success ${env.JOB_NAME} ${env.BUILD_NUMBER}"
