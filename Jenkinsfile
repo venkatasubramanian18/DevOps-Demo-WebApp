@@ -100,18 +100,16 @@ pipeline {
 			rtBuildInfo (
 				captureEnv: true
 			)
-			rtUpload(serverId: 'Artifactory')
+			rtUpload(
+				serverId: 'Artifactory',
+				specPath: '/var/lib/jenkins/workspace/devops-pipeline/target/build-info.json'
+			)
+			rtDownload(
+				serverId: 'Artifactory',
+				specPath: '/var/lib/jenkins/workspace/devops-pipeline/target/build-info.json'
+			)			
 			rtPublishBuildInfo (
-			    serverId: 'Artifactory',
-				spec: """{
-					      "files": [
-						{
-						  "pattern": "${FILES_DIR}a.in",
-						  "target": "${LOCAL_REPO1}/a5",
-						  "recursive": "false"
-						}
-					     ]
-					    }"""				
+			    serverId: 'Artifactory',			
 			)
 		}
 	}
