@@ -78,12 +78,12 @@ pipeline {
 			    //opts: '-Dartifactory.publish.buildInfo=true'
 			    // If the build name and build number are not set here, the current job name and number will be used:
 			)	
-			rtBuildInfo (
-				captureEnv: true
-			)
-			rtPublishBuildInfo (
-			    serverId: 'Artifactory'			
-			)			
+			//rtBuildInfo (
+			//	captureEnv: true
+			//)
+			//rtPublishBuildInfo (
+			//    serverId: 'Artifactory'			
+			//)			
     			//rtUpload(serverId: 'Artifactory')
 			jiraSendBuildInfo branch: 'DD-3', site: 'jira-devops18.atlassian.net'
 			slackSend channel: SlackChannel, tokenCredentialId: SlackToken, message: "Build Success ${env.JOB_NAME} ${env.BUILD_NUMBER}"
@@ -106,6 +106,7 @@ pipeline {
    	}
 	stage('Store Artifact') {
 		steps{
+			ScriptedArtifactRun()
 			//rtBuildInfo (
 			//	captureEnv: true
 			//)
@@ -117,10 +118,10 @@ pipeline {
 			//	serverId: 'Artifactory',
 			//	specPath: '/var/lib/jenkins/workspace/devops-pipeline/target/build-info.json'
 			//)			
-			rtUpload(serverId: 'Artifactory', specPath: '/var/lib/jenkins/workspace/devops-pipeline/target/build-info.json')
-			rtPublishBuildInfo (
-			    serverId: 'Artifactory'		
-			)
+			//rtUpload(serverId: 'Artifactory', specPath: '/var/lib/jenkins/workspace/devops-pipeline/target/build-info.json')
+			//rtPublishBuildInfo (
+			//   serverId: 'Artifactory'		
+			//)
 		}
 	}
 	stage('Perform UI Test - Publish Report') {
@@ -218,4 +219,17 @@ pipeline {
 		slackSend channel: SlackChannel, tokenCredentialId: SlackToken, message: "Failed in some stage ${env.JOB_NAME} ${env.BUILD_NUMBER}"
 	}
     }
+}
+void ScriptedArtifactRun() {
+			script {
+				def server = Artifactory.server "artifactory"
+				def rtMaven = Artifactory.newMavenBuild()
+				def buildInfo = Artifactory.newBuildInfo()
+				rtMaven.tool = "maven"
+				rtMaven.deployer releaseRepo:'libs-release-local', snapshotRepo:'libs-snapshot-local', server: server
+         			rtMaven.resolver releaseRepo:'libs-release', snapshotRepo:'libs-snapshot', server: server
+    				rtMaven.deployer.deployArtifacts = false // Disable artifacts deployment during Maven run
+				buildInfo = rtMaven.run pom: 'pom.xml', goals: 'clean install -e', buildInfo: buildInfo
+				server.publishBuildInfo buildInfo
+			}	
 }
