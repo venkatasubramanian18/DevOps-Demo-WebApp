@@ -108,7 +108,7 @@ pipeline {
 			//)
 			rtUpload(
 				serverId: 'Artifactory',
-				specPath: '/webapp/builds/devops-pipeline/'
+				//specPath: '/webapp/builds/devops-pipeline/'
 			)
 			//rtDownload(
 			//	serverId: 'Artifactory',
