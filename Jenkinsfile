@@ -85,7 +85,7 @@ pipeline {
 				    "files": [
 					    {
 						"pattern": "/var/lib/jenkins/.m2/repository/WEBPOC/AVNCommunication/1.0/AVNCommunication-1.0.war",
-						"target": "ui/builds/devops-pipeline/307/1604376822572/published/WEBPOC:AVNCommunication:1.0/"
+						"target": "ui/builds/devops-pipeline/307/1604376822572/published/"
 					    }
 					]
 				    }"""
