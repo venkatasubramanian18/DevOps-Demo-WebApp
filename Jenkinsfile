@@ -115,7 +115,9 @@ pipeline {
 			//	specPath: '/var/lib/jenkins/workspace/devops-pipeline/target/build-info.json'
 			//)			
 			rtPublishBuildInfo (
-			    serverId: 'Artifactory',			
+			    serverId: 'Artifactory',
+			    buildName: ${env.JOB_NAME},
+			    buildNumber: ${env.BUILD_NUMBER}			
 			)
 		}
 	}
