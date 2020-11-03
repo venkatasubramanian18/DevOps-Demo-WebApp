@@ -78,13 +78,16 @@ pipeline {
 			    //opts: '-Dartifactory.publish.buildInfo=true'
 			    // If the build name and build number are not set here, the current job name and number will be used:
 			)
-			rtMavenRun (
-			  tool: 'maven',
-			  pom: 'pom.xml',
-			  goals: 'install -o -e',
-			  //opts: '-Dartifactory.publish.artifacts=true -Dartifactory.publish.buildInfo=true',
-			  resolverId: 'resolver-artifactory',
-			  deployerId: 'deployer-artifactory'
+			rtUpload (
+			    serverId: "Artifactory", // Obtain an Artifactory server instance, defined in Jenkins --> Manage:
+			    spec: """{
+				    "files": [
+					    {
+						"pattern": "/var/lib/jenkins/.m2/repository/WEBPOC/AVNCommunication/1.0/AVNCommunication-1.0.war",
+						"target": "libs-snapshot-local/WEBPOC/AVNCommunication/1.0/"
+					    }
+					]
+				    }"""
 			)
 			rtPublishBuildInfo (
 			  serverId: "Artifactory"
