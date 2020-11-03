@@ -78,6 +78,9 @@ pipeline {
 			    //opts: '-Dartifactory.publish.buildInfo=true'
 			    // If the build name and build number are not set here, the current job name and number will be used:
 			)	
+			rtBuildInfo (
+				captureEnv: true
+			)
 			rtPublishBuildInfo (
 			    serverId: 'Artifactory'			
 			)			
