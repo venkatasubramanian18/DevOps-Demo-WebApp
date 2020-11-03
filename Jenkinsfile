@@ -82,7 +82,7 @@ pipeline {
 			  tool: 'maven',
 			  pom: 'pom.xml',
 			  goals: 'install -o -e',
-			  opts: '-Dartifactory.publish.artifacts=true -Dartifactory.publish.buildInfo=true',
+			  //opts: '-Dartifactory.publish.artifacts=true -Dartifactory.publish.buildInfo=true',
 			  resolverId: 'resolver-artifactory',
 			  deployerId: 'deployer-artifactory'
 			)
