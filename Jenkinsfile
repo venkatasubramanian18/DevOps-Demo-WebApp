@@ -72,8 +72,9 @@ pipeline {
 			    goals: 'clean install -e',
 			    // Maven options.
 			    //opts: '-Xms1024m -Xmx4096m',
-			    //resolverId: 'resolver-artifactory',
-			    deployerId: 'deployer-artifactory'
+			    resolverId: 'resolver-artifactory',
+			    deployerId: 'deployer-artifactory',
+			    opts: '-Dartifactory.publish.artifacts=true -Dartifactory.publish.buildInfo=true'
 			    // If the build name and build number are not set here, the current job name and number will be used:
 			)	
 			rtPublishBuildInfo (
@@ -101,17 +102,17 @@ pipeline {
    	}
 	stage('Store Artifact') {
 		steps{
-			rtBuildInfo (
-				captureEnv: true
-			)
-			rtUpload(
-				serverId: 'Artifactory',
-				specPath: '/var/lib/jenkins/workspace/devops-pipeline/target/build-info.json'
-			)
-			rtDownload(
-				serverId: 'Artifactory',
-				specPath: '/var/lib/jenkins/workspace/devops-pipeline/target/build-info.json'
-			)			
+			//rtBuildInfo (
+			//	captureEnv: true
+			//)
+			//rtUpload(
+			//	serverId: 'Artifactory',
+			//	specPath: '/var/lib/jenkins/workspace/devops-pipeline/target/build-info.json'
+			//)
+			//rtDownload(
+			//	serverId: 'Artifactory',
+			//	specPath: '/var/lib/jenkins/workspace/devops-pipeline/target/build-info.json'
+			//)			
 			rtPublishBuildInfo (
 			    serverId: 'Artifactory',			
 			)
