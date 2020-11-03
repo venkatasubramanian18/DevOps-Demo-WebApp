@@ -106,10 +106,10 @@ pipeline {
 			//rtBuildInfo (
 			//	captureEnv: true
 			//)
-			//rtUpload(
-			//	serverId: 'Artifactory',
-			//	specPath: '/var/lib/jenkins/workspace/devops-pipeline/target/build-info.json'
-			//)
+			rtUpload(
+				serverId: 'Artifactory',
+				specPath: '/webapp/builds/devops-pipeline/'
+			)
 			//rtDownload(
 			//	serverId: 'Artifactory',
 			//	specPath: '/var/lib/jenkins/workspace/devops-pipeline/target/build-info.json'
