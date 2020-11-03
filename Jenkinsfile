@@ -69,12 +69,15 @@ pipeline {
 			    pom: 'pom.xml',
 			    //goals: 'clean install deploy -e -o',
 			    //goals: 'clean install',
-			    goals: 'clean install deploy -e',
+			    goals: 'clean install -e',
 			    // Maven options.
-			    opts: '-Xms1024m -Xmx4096m',
-			    resolverId: 'resolver-artifactory',
+			    //opts: '-Xms1024m -Xmx4096m',
+			    //resolverId: 'resolver-artifactory',
 			    deployerId: 'deployer-artifactory'
 			    // If the build name and build number are not set here, the current job name and number will be used:
+			)	
+			rtPublishBuildInfo (
+			    serverId: 'Artifactory',			
 			)			
     			//rtUpload(serverId: 'Artifactory')
 			jiraSendBuildInfo branch: 'DD-3', site: 'jira-devops18.atlassian.net'
