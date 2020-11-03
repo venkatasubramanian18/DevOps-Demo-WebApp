@@ -61,16 +61,7 @@ pipeline {
 //		}
 //	}
 	stage('Build - Maven') {
-		steps {
-			rtMavenDeployer (
-			    id: 'deployer-artifactory',
-			    serverId: rtServerID,
-			    deployArtifacts: false,
-			    releaseRepo: 'libs-release-local',
-			    snapshotRepo: 'libs-snapshot-local',
-			    // By default, 3 threads are used to upload the artifacts to Artifactory. You can override this default by setting:
-			    threads: 6
-			)			
+		steps {		
 			//sh 'mvn clean install'
 			rtMavenRun (
 			    // Tool name from Jenkins configuration.
@@ -78,7 +69,7 @@ pipeline {
 			    pom: 'pom.xml',
 			    //goals: 'clean install deploy -e -o',
 			    //goals: 'clean install',
-			    goals: 'clean install -o -e',
+			    goals: 'clean install -e',
 			    // Maven options.
 			    //opts: '-Xms1024m -Xmx4096m',
 			    resolverId: 'resolver-artifactory',
@@ -88,7 +79,7 @@ pipeline {
 			    // If the build name and build number are not set here, the current job name and number will be used:
 			)	
 			rtPublishBuildInfo (
-			    serverId: 'Artifactory',			
+			    serverId: 'Artifactory'			
 			)			
     			//rtUpload(serverId: 'Artifactory')
 			jiraSendBuildInfo branch: 'DD-3', site: 'jira-devops18.atlassian.net'
