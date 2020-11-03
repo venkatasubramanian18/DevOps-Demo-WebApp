@@ -114,10 +114,9 @@ pipeline {
 			//	serverId: 'Artifactory',
 			//	specPath: '/var/lib/jenkins/workspace/devops-pipeline/target/build-info.json'
 			//)			
+			rtUpload(serverId: 'Artifactory', specPath: '/var/lib/jenkins/workspace/devops-pipeline/target/build-info.json')
 			rtPublishBuildInfo (
-			    serverId: 'Artifactory',
-			    buildName: env.JOB_NAME,
-			    buildNumber: env.BUILD_NUMBER			
+			    serverId: 'Artifactory'		
 			)
 		}
 	}
