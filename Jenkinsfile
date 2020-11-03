@@ -78,6 +78,7 @@ pipeline {
 			    //opts: '-Dartifactory.publish.buildInfo=true'
 			    // If the build name and build number are not set here, the current job name and number will be used:
 			)
+			echo 'Success 1'
 			rtUpload (
 			    serverId: "Artifactory", // Obtain an Artifactory server instance, defined in Jenkins --> Manage:
 			    spec: """{
@@ -89,6 +90,7 @@ pipeline {
 					]
 				    }"""
 			)
+			echo 'Success 2'
 			rtPublishBuildInfo (
 			  serverId: "Artifactory"
 			)			
