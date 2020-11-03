@@ -84,8 +84,7 @@ pipeline {
 			    spec: """{
 				    "files": [
 					    {
-						"pattern": "/var/lib/jenkins/.m2/repository/WEBPOC/AVNCommunication/1.0/AVNCommunication-1.0.war",
-						"target": "libs-snapshot-local"
+						"pattern": "/var/lib/jenkins/.m2/repository/WEBPOC/AVNCommunication/1.0/AVNCommunication-1.0.war"
 					    }
 					]
 				    }"""
