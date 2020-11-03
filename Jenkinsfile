@@ -62,6 +62,15 @@ pipeline {
 //	}
 	stage('Build - Maven') {
 		steps {
+			rtMavenDeployer (
+			    id: 'deployer-artifactory',
+			    serverId: rtServerID,
+			    deployArtifacts: false,
+			    releaseRepo: 'libs-release-local',
+			    snapshotRepo: 'libs-snapshot-local',
+			    // By default, 3 threads are used to upload the artifacts to Artifactory. You can override this default by setting:
+			    threads: 6
+			)			
 			//sh 'mvn clean install'
 			rtMavenRun (
 			    // Tool name from Jenkins configuration.
@@ -78,9 +87,9 @@ pipeline {
 			    //opts: '-Dartifactory.publish.buildInfo=true'
 			    // If the build name and build number are not set here, the current job name and number will be used:
 			)	
-			//rtPublishBuildInfo (
-			//    serverId: 'Artifactory',			
-			//)			
+			rtPublishBuildInfo (
+			    serverId: 'Artifactory',			
+			)			
     			//rtUpload(serverId: 'Artifactory')
 			jiraSendBuildInfo branch: 'DD-3', site: 'jira-devops18.atlassian.net'
 			slackSend channel: SlackChannel, tokenCredentialId: SlackToken, message: "Build Success ${env.JOB_NAME} ${env.BUILD_NUMBER}"
