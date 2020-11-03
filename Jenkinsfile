@@ -67,8 +67,9 @@ pipeline {
 			    // Tool name from Jenkins configuration.
 			    tool: 'maven',
 			    pom: 'pom.xml',
-			    goals: 'clean install deploy -e -o',
+			    //goals: 'clean install deploy -e -o',
 			    //goals: 'clean install',
+			    goals: 'clean install deploy -e',
 			    // Maven options.
 			    opts: '-Xms1024m -Xmx4096m',
 			    resolverId: 'resolver-artifactory',
