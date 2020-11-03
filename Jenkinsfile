@@ -77,24 +77,7 @@ pipeline {
 			    deployerId: 'deployer-artifactory',
 			    //opts: '-Dartifactory.publish.buildInfo=true'
 			    // If the build name and build number are not set here, the current job name and number will be used:
-			)
-			echo 'Success 1'
-			rtUpload (
-			    serverId: "Artifactory", // Obtain an Artifactory server instance, defined in Jenkins --> Manage:
-			    spec: """{
-				    "files": [
-					    {
-						"pattern": "/var/lib/jenkins/.m2/repository/WEBPOC/AVNCommunication/1.0/AVNCommunication-1.0.war",
-						"target": "ui/builds/devops-pipeline/307/1604376822572/published/"
-					    }
-					]
-				    }"""
-			)
-			echo 'Success 2'
-			rtPublishBuildInfo (
-			  serverId: "Artifactory"
 			)			
-    			//rtUpload(serverId: 'Artifactory')
 			jiraSendBuildInfo branch: 'DD-3', site: 'jira-devops18.atlassian.net'
 			slackSend channel: SlackChannel, tokenCredentialId: SlackToken, message: "Build Success ${env.JOB_NAME} ${env.BUILD_NUMBER}"
 		}
