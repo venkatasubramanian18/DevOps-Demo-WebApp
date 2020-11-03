@@ -78,9 +78,9 @@ pipeline {
 			    //opts: '-Dartifactory.publish.buildInfo=true'
 			    // If the build name and build number are not set here, the current job name and number will be used:
 			)	
-			rtPublishBuildInfo (
-			    serverId: 'Artifactory',			
-			)			
+			//rtPublishBuildInfo (
+			//    serverId: 'Artifactory',			
+			//)			
     			//rtUpload(serverId: 'Artifactory')
 			jiraSendBuildInfo branch: 'DD-3', site: 'jira-devops18.atlassian.net'
 			slackSend channel: SlackChannel, tokenCredentialId: SlackToken, message: "Build Success ${env.JOB_NAME} ${env.BUILD_NUMBER}"
@@ -116,8 +116,8 @@ pipeline {
 			//)			
 			rtPublishBuildInfo (
 			    serverId: 'Artifactory',
-			    buildName: ${env.JOB_NAME},
-			    buildNumber: ${env.BUILD_NUMBER}			
+			    buildName: env.JOB_NAME,
+			    buildNumber: env.BUILD_NUMBER			
 			)
 		}
 	}
