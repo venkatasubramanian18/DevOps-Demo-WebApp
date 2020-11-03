@@ -69,17 +69,14 @@ pipeline {
 			    pom: 'pom.xml',
 			    //goals: 'clean install deploy -e -o',
 			    //goals: 'clean install',
-			    goals: 'clean install -e',
+			    goals: 'clean install -o -e',
 			    // Maven options.
 			    //opts: '-Xms1024m -Xmx4096m',
 			    resolverId: 'resolver-artifactory',
 			    deployerId: 'deployer-artifactory',
 			    opts: '-Dartifactory.publish.artifacts=true -Dartifactory.publish.buildInfo=true'
 			    // If the build name and build number are not set here, the current job name and number will be used:
-			)	
-			rtPublishBuildInfo (
-			    serverId: 'Artifactory',			
-			)			
+			)				
     			//rtUpload(serverId: 'Artifactory')
 			jiraSendBuildInfo branch: 'DD-3', site: 'jira-devops18.atlassian.net'
 			slackSend channel: SlackChannel, tokenCredentialId: SlackToken, message: "Build Success ${env.JOB_NAME} ${env.BUILD_NUMBER}"
