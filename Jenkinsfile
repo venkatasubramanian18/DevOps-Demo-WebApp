@@ -74,8 +74,8 @@ pipeline {
 			    //opts: '-Xms1024m -Xmx4096m',
 			    resolverId: 'resolver-artifactory',
 			    deployerId: 'deployer-artifactory',
-			    //opts: '-Dartifactory.publish.artifacts=true -Dartifactory.publish.buildInfo=true'
-			    opts: '-Dartifactory.publish.buildInfo=true'
+			    opts: '-Dartifactory.publish.artifacts=false -Dartifactory.publish.buildInfo=false'
+			    //opts: '-Dartifactory.publish.buildInfo=true'
 			    // If the build name and build number are not set here, the current job name and number will be used:
 			)	
 			rtPublishBuildInfo (
