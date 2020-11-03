@@ -100,11 +100,10 @@ pipeline {
 			rtBuildInfo (
 				captureEnv: true
 			)
-			
-			//rtPublishBuildInfo (
-			//    serverId: 'Artifactory',
-			//)
 			rtUpload(serverId: 'Artifactory')
+			rtPublishBuildInfo (
+			    serverId: 'Artifactory'
+			)
 		}
 	}
 	stage('Perform UI Test - Publish Report') {
