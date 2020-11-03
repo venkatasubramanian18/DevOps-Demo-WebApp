@@ -102,7 +102,16 @@ pipeline {
 			)
 			rtUpload(serverId: 'Artifactory')
 			rtPublishBuildInfo (
-			    serverId: 'Artifactory'
+			    serverId: 'Artifactory',
+				spec: """{
+					      "files": [
+						{
+						  "pattern": "${FILES_DIR}a.in",
+						  "target": "${LOCAL_REPO1}/a5",
+						  "recursive": "false"
+						}
+					     ]
+					    }"""				
 			)
 		}
 	}
