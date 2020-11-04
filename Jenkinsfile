@@ -13,6 +13,7 @@ pipeline {
 	SlackToken = 'slacktoken'
 	JiraURL = 'jira-devops18.atlassian.net'
 	JiraIssueKey = 'DD-3'
+	JiraSiteForTransition = 'jirasite'
 	SonarCredential = 'sonar'	
 	SonarInstallationName = 'sonarqube'
 	TomcatCredential = 'tomcat'
@@ -148,7 +149,7 @@ pipeline {
 				post {
 					always { 
 						jiraSendDeploymentInfo environmentId: 'Prod', environmentName: 'Production', serviceIds: [''], environmentType: 'production', site: JiraURL, state: 'successful'
-						jiraTransitionIssue idOrKey: JiraIssueKey, input: [ transition: [ id: 31] ], site: JiraURL
+						jiraTransitionIssue idOrKey: JiraIssueKey, input: [ transition: [ id: 31] ], site: JiraSiteForTransition
 					}
 				}
 			}			
