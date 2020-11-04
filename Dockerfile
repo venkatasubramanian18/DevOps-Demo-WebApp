@@ -9,7 +9,7 @@ RUN pwd
 #COPY pom.xml /var/lib/tomcat8/webapps/
 #COPY /target/*.war /var/lib/tomcat8/webapps/
 #COPY /target/*.war /var/lib/tomcat8/webapps/
-COPY /target/*.war /usr/local/tomcat/webapps/
+COPY ./target/*.war /usr/local/tomcat/webapps/
 RUN pwd 
 #WORKDIR /usr/local/tomcat/webapps/
 
