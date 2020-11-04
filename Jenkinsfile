@@ -22,9 +22,7 @@ pipeline {
 	
     stages {	
         stage ('Artifactory configuration') {
-            steps {
-		//ArtifactConfig()
-            }	
+		//ArtifactConfig()	
 	}			
         stage('SCM - GIT Commit') {
             steps {
@@ -206,6 +204,7 @@ void ScriptedArtifactRun() {
 }
 
 void ArtifactConfig() {
+            steps {	
                 rtServer (
                    id: rtServerID,
                    url: JfrogURL,
@@ -226,6 +225,7 @@ void ArtifactConfig() {
 		    // By default, 3 threads are used to upload the artifacts to Artifactory. You can override this default by setting:
 		    threads: 6
 		)
+	    }
 }
 
 void ArtifactRun() {
