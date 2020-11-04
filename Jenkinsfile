@@ -102,7 +102,7 @@ pipeline {
 		steps{
 			//ScriptedArtifactRun()
 			        rtUpload (
-			             serverId: 'Artifactory',
+			             serverId: 'artifactory',
 			             spec: """{
 			                     "files": [
 			                             {
@@ -125,7 +125,7 @@ pipeline {
 			//)			
 			//rtUpload(serverId: 'Artifactory', specPath: '/var/lib/jenkins/workspace/devops-pipeline/target/build-info.json')
 			rtPublishBuildInfo (
-			   serverId: 'Artifactory'		
+			   serverId: 'artifactory'		
 			)
 		}
 	}
