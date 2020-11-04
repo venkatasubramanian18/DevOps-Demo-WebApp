@@ -5,7 +5,7 @@ pipeline {
 	registryCredential = 'dockerhub'
 	dockerImage = ''
 	JfrogURL = 'https://devops111.jfrog.io/artifactory'
-	JfrogLogin = 'artifactory'
+	JfrogLogin = 'Artifactory'
 	rtServerID = 'Artifactory'
 	GitHubURL = 'git@github.com:venkatasubramanian18/DevOps-Demo-WebApp.git'
 	GitHubLogin = 'github'
