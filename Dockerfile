@@ -3,7 +3,7 @@ FROM tomcat:8-jre8
 
 LABEL maintainer=”venkatasubramanian18@gmail.com”
 
-RUN mkdir -p /usr/local/tomcat/webapps
+#RUN mkdir -p /usr/local/tomcat/
 RUN ls -ltr 
 RUN pwd 
 #COPY pom.xml /var/lib/tomcat8/webapps/
