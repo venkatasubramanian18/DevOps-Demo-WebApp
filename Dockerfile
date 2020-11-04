@@ -15,6 +15,6 @@ RUN pwd
 # build for release
 #RUN mvn clean install -e
 
-EXPOSE 8000
+#EXPOSE 8000
 
 #CMD [“catalina.sh”, “run”]
