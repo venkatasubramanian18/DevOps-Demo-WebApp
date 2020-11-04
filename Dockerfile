@@ -16,7 +16,7 @@ RUN pwd
 # build for release
 #RUN mvn clean install -e
 
-#EXPOSE 8000
+EXPOSE 8081
 
 #CMD [“catalina.sh”, “run”]
 CMD ["/usr/local/tomcat/bin/catalina.sh","run"]
