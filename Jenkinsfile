@@ -58,7 +58,8 @@ pipeline {
 		steps {		
 			sh 'mvn clean install'
 			//ArtifactRun()
-			jiraSendBuildInfo branch: JiraIssueKey, site: JiraURL
+			jiraTransitionIssue idOrKey: JiraIssueKey, input: [ transition: [ id: 21] ], site: JiraSiteForTransition
+			jiraSendBuildInfo branch: JiraIssueKey, site: JiraURL			
 			slackSend channel: SlackChannel, tokenCredentialId: SlackToken, message: "Build Success ${env.JOB_NAME} ${env.BUILD_NUMBER}"
 		}
  	} 
