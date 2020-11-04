@@ -22,7 +22,10 @@ pipeline {
 	
     stages {	
         stage ('Artifactory configuration') {
-		//ArtifactConfig()	
+		steps {			
+			echo 'Artifact config'
+			//ArtifactConfig()	
+		}
 	}			
         stage('SCM - GIT Commit') {
             steps {
