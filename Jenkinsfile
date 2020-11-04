@@ -23,7 +23,7 @@ pipeline {
         stage('Artifactory configuration') {
 		steps {			
 			echo 'Artifact config'
-			//ArtifactConfig()	
+			ArtifactConfig()	
 		}
 	}			
         stage('SCM - GIT Commit') {
@@ -43,8 +43,8 @@ pipeline {
 //	}
 	stage('Build - Maven') {
 		steps {		
-			sh 'mvn clean install'
-			//ArtifactRun()
+			//sh 'mvn clean install'
+			ArtifactRun()
 			jiraSendBuildInfo branch: 'DD-3', site: 'jira-devops18.atlassian.net'
 			slackSend channel: SlackChannel, tokenCredentialId: SlackToken, message: "Build Success ${env.JOB_NAME} ${env.BUILD_NUMBER}"
 		}
@@ -191,22 +191,7 @@ pipeline {
 	}
     }
 }
-void ScriptedArtifactRun() {
-			script {
-				def server = Artifactory.server "artifactory"
-				def rtMaven = Artifactory.newMavenBuild()
-				def buildInfo = Artifactory.newBuildInfo()
-				rtMaven.tool = "maven"
-				rtMaven.deployer releaseRepo:'libs-release-local', snapshotRepo:'libs-snapshot-local', server: server
-         			rtMaven.resolver releaseRepo:'libs-release', snapshotRepo:'libs-snapshot', server: server
-    				rtMaven.deployer.deployArtifacts = false // Disable artifacts deployment during Maven run
-				buildInfo = rtMaven.run pom: 'pom.xml', goals: 'clean install -e', buildInfo: buildInfo
-				server.publishBuildInfo buildInfo
-			}	
-}
-
 void ArtifactConfig() {
-            steps {	
                 rtServer (
                    id: rtServerID,
                    url: JfrogURL,
@@ -227,7 +212,6 @@ void ArtifactConfig() {
 		    // By default, 3 threads are used to upload the artifacts to Artifactory. You can override this default by setting:
 		    threads: 6
 		)
-	    }
 }
 
 void ArtifactRun() {
@@ -240,7 +224,7 @@ void ArtifactRun() {
 			    goals: 'clean install -e',
 			    // Maven options.
 			    //opts: '-Xms1024m -Xmx4096m',
-			    opts: '-Dartifactory.publish.artifacts=false -Dartifactory.publish.buildInfo=false',				
+			    //opts: '-Dartifactory.publish.artifacts=false -Dartifactory.publish.buildInfo=false',				
 			    resolverId: 'resolver-artifactory',
 			    deployerId: 'deployer-artifactory',
 			    //opts: '-Dartifactory.publish.buildInfo=true'
