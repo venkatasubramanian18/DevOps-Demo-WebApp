@@ -6,4 +6,6 @@ RUN pwd
 COPY ./target/*.war /usr/local/tomcat/webapps
 RUN pwd 
 
-CMD ["/usr/local/tomcat/bin/catalina.sh","start"]
+EXPOSE 8080
+
+CMD ["/usr/local/tomcat/bin/catalina.sh","run"]
