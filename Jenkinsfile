@@ -126,10 +126,9 @@ pipeline {
 					}					
 					stage('Kubernetes Deploy') {
 						steps{
-							//sh 'ls -ltr'
 							sh 'pwd'
 							//sh "sed -i 's/tagversion/${env.BUILD_ID}/g' deployment.yaml"		
-							sh "sed -i 's/tagversion/${env.BUILD_ID}' deployment.yaml"	
+							sh "sed -i 's/tagversion/${env.BUILD_ID}/' deployment.yaml"	
 							step([$class: 'KubernetesEngineBuilder', 
 								projectId: KubernetesProjectID,
 								clusterName: KubernetesClusterName,
