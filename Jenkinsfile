@@ -83,16 +83,16 @@ pipeline {
 			StoreArtifact()
 		}
 	}
-	stage('Perform UI Test - Publish Report') {
-		steps{
-			script {
-			  sh 'mvn -f functionaltest/pom.xml package'
-			  sh 'mvn package test'
-			  publishHTML([allowMissing: false, alwaysLinkToLastBuild: false, keepAll: false, reportDir: '\\functionaltest\\target\\surefire-reports', reportFiles: 'index.html', reportName: 'UI Test Report', reportTitles: ''])
-			}
-		}
-	}
-	    
+//	stage('Perform UI Test - Publish Report') {
+//		steps{
+//			script {
+//			  sh 'mvn -f functionaltest/pom.xml package'
+//			  sh 'mvn package test'
+//			  publishHTML([allowMissing: false, alwaysLinkToLastBuild: false, keepAll: false, reportDir: '\\functionaltest\\target\\surefire-reports', reportFiles: 'index.html', reportName: 'UI Test Report', reportTitles: ''])
+//			}
+//		}
+//	}
+//	    
 //	stage('Performance Test - Blazemeter') {
 //		steps{
 //	   		blazeMeterTest credentialsId: BlazemeterCredential, testId: '8626535.taurus', workspaceId: '677291'
