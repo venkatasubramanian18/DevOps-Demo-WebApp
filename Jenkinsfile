@@ -11,8 +11,13 @@ pipeline {
 	GitHubLogin = 'github'
 	SlackChannel = '#devops'
 	SlackToken = 'slacktoken'
+	JiraURL = 'jira-devops18.atlassian.net'
 	SonarCredential = 'sonar'	
 	SonarInstallationName = 'sonarqube'
+	TomcatCredential = 'tomcat'
+	TestDeployURL = 'http://23.101.207.158:8080/'	
+	ProdDeployURL = 'http://51.141.177.121:8080/'
+	BlazemeterCredential = 'Blazemeter'
     }	
 	
     agent any
@@ -46,14 +51,15 @@ pipeline {
 	stage('Build - Maven') {
 		steps {		
 			sh 'mvn clean install'
-			jiraSendBuildInfo branch: 'DD-3', site: 'jira-devops18.atlassian.net'
+			//ArtifactRun()
+			jiraSendBuildInfo branch: 'DD-3', site: JiraURL
 			slackSend channel: SlackChannel, tokenCredentialId: SlackToken, message: "Build Success ${env.JOB_NAME} ${env.BUILD_NUMBER}"
 		}
  	} 
     	stage('Test Server Deploy') {
 		steps{
 			script {
-				deploy adapters: [tomcat8(credentialsId: 'tomcat', path: '', url: 'http://23.101.207.158:8080/')], contextPath: '/QAWebapp', war: '**/*.war'	
+				deploy adapters: [tomcat8(credentialsId: TomcatCredential, path: '', url: TestDeployURL)], contextPath: '/QAWebapp', war: '**/*.war'	
 				slackSend channel: SlackChannel, tokenCredentialId: SlackToken, message: "Deployed to Test ${env.JOB_NAME} ${env.BUILD_NUMBER}"	
 				jiraComment body: "Deploy to Test was successfull ${env.JOB_NAME} ${env.BUILD_NUMBER}", issueKey: 'DD-3'				
 			}
@@ -61,7 +67,7 @@ pipeline {
 		}
 		post {
 			always { 
-			jiraSendDeploymentInfo environmentId: 'Test', environmentName: 'Test', serviceIds: [''], environmentType: 'testing', site: 'jira-devops18.atlassian.net', state: 'successful'
+			jiraSendDeploymentInfo environmentId: 'Test', environmentName: 'Test', serviceIds: [''], environmentType: 'testing', site: JiraURL, state: 'successful'
 			}
 		}
    	}
@@ -82,7 +88,7 @@ pipeline {
 	    
 //	stage('Performance Test - Blazemeter') {
 //		steps{
-//	   		blazeMeterTest credentialsId: 'Blazemeter', testId: '8626535.taurus', workspaceId: '677291'
+//	   		blazeMeterTest credentialsId: BlazemeterCredential, testId: '8626535.taurus', workspaceId: '677291'
 //	    		slackSend channel: SlackChannel, tokenCredentialId: SlackToken, message: "Performance Test - Blazemeter ${env.JOB_NAME} ${env.BUILD_NUMBER}"
 //		}
 //	}	  
@@ -131,13 +137,13 @@ pipeline {
 			}
 			stage('Prod Server Deploy') {		
 				steps{
-					deploy adapters: [tomcat8(credentialsId: 'tomcat', path: '', url: 'http://51.141.177.121:8080/')], contextPath: '/ProdWebapp', war: '**/*.war'	
+					deploy adapters: [tomcat8(credentialsId: TomcatCredential, path: '', url: TestDeployURL)], contextPath: '/ProdWebapp', war: '**/*.war'	
 					slackSend channel: SlackChannel, tokenCredentialId: SlackToken, message: "Deployed to Prod ${env.JOB_NAME} ${env.BUILD_NUMBER}"	    
 					jiraComment body: "Deploy to Prod was successfull ${env.JOB_NAME} ${env.BUILD_NUMBER}", issueKey: 'DD-3'
 				}
 				post {
 					always { 
-						jiraSendDeploymentInfo environmentId: 'Prod', environmentName: 'Production', serviceIds: [''], environmentType: 'production', site: 'jira-devops18.atlassian.net', state: 'successful'
+						jiraSendDeploymentInfo environmentId: 'Prod', environmentName: 'Production', serviceIds: [''], environmentType: 'production', site: JiraURL, state: 'successful'
 					}
 				}
 			}			
