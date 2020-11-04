@@ -4,7 +4,8 @@ pipeline {
 	registry = "devopstraining18/mavenbuild"
 	registryCredential = 'dockerhub'
 	dockerImage = ''
-	JfrogURL = 'https://devops111.jfrog.io/artifactory'
+	//JfrogURL = 'https://devops111.jfrog.io/artifactory'
+	JfrogURL = 'https://casestudync.jfrog.io/artifactory'
 	JfrogLogin = 'Artifactory'
 	rtServerID = 'Artifactory'
 	GitHubURL = 'git@github.com:venkatasubramanian18/DevOps-Demo-WebApp.git'
