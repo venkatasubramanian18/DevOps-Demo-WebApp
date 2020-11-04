@@ -8,7 +8,7 @@ RUN ls -ltr
 RUN pwd 
 #COPY pom.xml /var/lib/tomcat8/webapps/
 #COPY /target/*.war /var/lib/tomcat8/webapps\
-COPY /var/lib/jenkins/workspace/devops-pipeline/target/AVNCommunication-1.0.war /var/lib/tomcat8/webapps/
+COPY /target/*.war /var/lib/tomcat8/webapps/
 RUN pwd 
 #WORKDIR /usr/local/tomcat/webapps/
 
