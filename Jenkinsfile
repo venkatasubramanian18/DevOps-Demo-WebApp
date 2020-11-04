@@ -20,12 +20,12 @@ pipeline {
     }
 	
     stages {	
-        stage('Artifactory configuration') {
-		steps {			
-			echo 'Artifact config'
-			ArtifactConfig()	
-		}
-	}			
+//        stage('Artifactory configuration') {
+//		steps {			
+//			echo 'Artifact config'
+//			ArtifactConfig()	
+//		}
+//	}			
         stage('SCM - GIT Commit') {
             steps {
                 // Get some code from a GitHub repository
@@ -43,8 +43,7 @@ pipeline {
 //	}
 	stage('Build - Maven') {
 		steps {		
-			//sh 'mvn clean install'
-			ArtifactRun()
+			sh 'mvn clean install'
 			jiraSendBuildInfo branch: 'DD-3', site: 'jira-devops18.atlassian.net'
 			slackSend channel: SlackChannel, tokenCredentialId: SlackToken, message: "Build Success ${env.JOB_NAME} ${env.BUILD_NUMBER}"
 		}
@@ -66,33 +65,7 @@ pipeline {
    	}
 	stage('Store Artifact') {
 		steps{
-			//ScriptedArtifactRun()
-			        rtUpload (
-			             serverId: 'artifactory',
-			             spec: """{
-			                     "files": [
-			                             {
-			                                 "pattern": "target/*.war",
-			                                 "target": "libs-release-local"
-			                             }
-			                         ]
-			                     }"""
-			         )			
-			//rtBuildInfo (
-			//	captureEnv: true
-			//)
-			//rtUpload(
-			//	serverId: 'Artifactory',
-				//specPath: '/webapp/builds/devops-pipeline/'
-			//)
-			//rtDownload(
-			//	serverId: 'Artifactory',
-			//	specPath: '/var/lib/jenkins/workspace/devops-pipeline/target/build-info.json'
-			//)			
-			//rtUpload(serverId: 'Artifactory', specPath: '/var/lib/jenkins/workspace/devops-pipeline/target/build-info.json')
-			rtPublishBuildInfo (
-			   serverId: 'artifactory'		
-			)
+			StoreArtifact()
 		}
 	}
 	stage('Perform UI Test - Publish Report') {
@@ -213,7 +186,7 @@ void ArtifactConfig() {
 		    threads: 6
 		)
 }
-
+	
 void ArtifactRun() {
 			rtMavenRun (
 			    // Tool name from Jenkins configuration.
@@ -229,5 +202,21 @@ void ArtifactRun() {
 			    deployerId: 'deployer-artifactory',
 			    //opts: '-Dartifactory.publish.buildInfo=true'
 			    // If the build name and build number are not set here, the current job name and number will be used:
+			)
+}
+void StoreArtifact() {
+			rtUpload (
+			     serverId: rtServerID,
+			      spec: """{
+			                     "files": [
+			                             {
+			                                 "pattern": "target/*.war",
+			                                 "target": "libs-release-local"
+			                             }
+			                         ]
+			      		}"""
+			      )			
+			rtPublishBuildInfo (
+			   serverId: rtServerID		
 			)
 }
