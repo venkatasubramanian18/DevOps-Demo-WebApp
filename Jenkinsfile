@@ -21,7 +21,7 @@ pipeline {
     }
 	
     stages {	
-        stage ('Artifactory configuration') {
+        stage('Artifactory configuration') {
 		steps {			
 			echo 'Artifact config'
 			//ArtifactConfig()	
