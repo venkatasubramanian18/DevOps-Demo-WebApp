@@ -19,6 +19,10 @@ pipeline {
 	TestDeployURL = 'http://23.101.207.158:8080/'	
 	ProdDeployURL = 'http://51.141.177.121:8080/'
 	BlazemeterCredential = 'Blazemeter'
+	KubernetesCredential = "k8saccount"
+	KubernetesProjectID = 'devops-294021'
+	KubernetesClusterName = 'k8scluster'
+	KubernetesZone = "us-west2-a"
     }	
 	
     agent any
@@ -126,11 +130,11 @@ pipeline {
 							sh 'pwd'
 							sh "sed -i 's/tagversion/${env.BUILD_ID}/g' deployment.yaml"			
 							step([$class: 'KubernetesEngineBuilder', 
-								projectId: 'devops-294021',
-								clusterName: "k8scluster",
-								zone: "us-west2-a",
+								projectId: KubernetesProjectID,
+								clusterName: KubernetesClusterName,
+								zone: KubernetesZone,
 								manifestPattern: 'deployment.yaml',
-								credentialsId: "k8saccount",
+								credentialsId: KubernetesCredential,
 								verifyDeployments: true])
 						}
 					}
