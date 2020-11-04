@@ -99,7 +99,18 @@ pipeline {
    	}
 	stage('Store Artifact') {
 		steps{
-			ScriptedArtifactRun()
+			//ScriptedArtifactRun()
+			        rtUpload (
+			             serverId: 'Artifactory',
+			             spec: """{
+			                     "files": [
+			                             {
+			                                 "pattern": "target/*.war",
+			                                 "target": "libs-release-local"
+			                             }
+			                         ]
+			                     }"""
+			         )			
 			//rtBuildInfo (
 			//	captureEnv: true
 			//)
@@ -112,9 +123,9 @@ pipeline {
 			//	specPath: '/var/lib/jenkins/workspace/devops-pipeline/target/build-info.json'
 			//)			
 			//rtUpload(serverId: 'Artifactory', specPath: '/var/lib/jenkins/workspace/devops-pipeline/target/build-info.json')
-			//rtPublishBuildInfo (
-			//   serverId: 'Artifactory'		
-			//)
+			rtPublishBuildInfo (
+			   serverId: 'Artifactory'		
+			)
 		}
 	}
 	stage('Perform UI Test - Publish Report') {
