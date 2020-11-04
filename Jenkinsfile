@@ -23,27 +23,7 @@ pipeline {
     stages {	
         stage ('Artifactory configuration') {
             steps {
-//		slackSend channel: '#devops', tokenCredentialId: 'slacktoken', message: "Pipeline build ${env.JOB_NAME} ${env.BUILD_NUMBER} (<${env.BUILD_URL}|Open>)"
-                rtServer (
-                   id: rtServerID,
-                   url: JfrogURL,
-                   credentialsId: JfrogLogin
-                )
-		rtMavenResolver (
-		    id: 'resolver-artifactory',
-		    serverId: rtServerID,
-		    releaseRepo: 'libs-release',
-		    snapshotRepo: 'libs-snapshot'
-		)  
-		rtMavenDeployer (
-		    id: 'deployer-artifactory',
-		    serverId: rtServerID,
-		    //deployArtifacts: false,
-		    releaseRepo: 'libs-release-local',
-		    snapshotRepo: 'libs-snapshot-local',
-		    // By default, 3 threads are used to upload the artifacts to Artifactory. You can override this default by setting:
-		    threads: 6
-		)
+		//ArtifactConfig()
             }	
 	}			
         stage('SCM - GIT Commit') {
@@ -63,22 +43,8 @@ pipeline {
 //	}
 	stage('Build - Maven') {
 		steps {		
-			//sh 'mvn clean install'
-			rtMavenRun (
-			    // Tool name from Jenkins configuration.
-			    tool: 'maven',
-			    pom: 'pom.xml',
-			    //goals: 'clean install deploy -e -o',
-			    //goals: 'clean install',
-			    goals: 'clean install -e',
-			    // Maven options.
-			    //opts: '-Xms1024m -Xmx4096m',
-			    opts: '-Dartifactory.publish.artifacts=false -Dartifactory.publish.buildInfo=false',				
-			    resolverId: 'resolver-artifactory',
-			    deployerId: 'deployer-artifactory',
-			    //opts: '-Dartifactory.publish.buildInfo=true'
-			    // If the build name and build number are not set here, the current job name and number will be used:
-			)			
+			sh 'mvn clean install'
+			//ArtifactRun()
 			jiraSendBuildInfo branch: 'DD-3', site: 'jira-devops18.atlassian.net'
 			slackSend channel: SlackChannel, tokenCredentialId: SlackToken, message: "Build Success ${env.JOB_NAME} ${env.BUILD_NUMBER}"
 		}
@@ -237,4 +203,45 @@ void ScriptedArtifactRun() {
 				buildInfo = rtMaven.run pom: 'pom.xml', goals: 'clean install -e', buildInfo: buildInfo
 				server.publishBuildInfo buildInfo
 			}	
+}
+
+void ArtifactConfig() {
+                rtServer (
+                   id: rtServerID,
+                   url: JfrogURL,
+                   credentialsId: JfrogLogin
+                )
+		rtMavenResolver (
+		    id: 'resolver-artifactory',
+		    serverId: rtServerID,
+		    releaseRepo: 'libs-release',
+		    snapshotRepo: 'libs-snapshot'
+		)  
+		rtMavenDeployer (
+		    id: 'deployer-artifactory',
+		    serverId: rtServerID,
+		    //deployArtifacts: false,
+		    releaseRepo: 'libs-release-local',
+		    snapshotRepo: 'libs-snapshot-local',
+		    // By default, 3 threads are used to upload the artifacts to Artifactory. You can override this default by setting:
+		    threads: 6
+		)
+}
+
+void ArtifactRun() {
+			rtMavenRun (
+			    // Tool name from Jenkins configuration.
+			    tool: 'maven',
+			    pom: 'pom.xml',
+			    //goals: 'clean install deploy -e -o',
+			    //goals: 'clean install',
+			    goals: 'clean install -e',
+			    // Maven options.
+			    //opts: '-Xms1024m -Xmx4096m',
+			    opts: '-Dartifactory.publish.artifacts=false -Dartifactory.publish.buildInfo=false',				
+			    resolverId: 'resolver-artifactory',
+			    deployerId: 'deployer-artifactory',
+			    //opts: '-Dartifactory.publish.buildInfo=true'
+			    // If the build name and build number are not set here, the current job name and number will be used:
+			)
 }
