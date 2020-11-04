@@ -12,6 +12,7 @@ pipeline {
 	SlackChannel = '#devops'
 	SlackToken = 'slacktoken'
 	JiraURL = 'jira-devops18.atlassian.net'
+	JiraIssueKey = 'DD-3'
 	SonarCredential = 'sonar'	
 	SonarInstallationName = 'sonarqube'
 	TomcatCredential = 'tomcat'
@@ -40,19 +41,19 @@ pipeline {
 		slackSend channel: SlackChannel, tokenCredentialId: SlackToken, message: "Pipeline build Started ${env.JOB_NAME} ${env.BUILD_NUMBER} (<${env.BUILD_URL}|Open>)"
             }
         }
-        stage('Code Analysis - SonarQube') {
-		steps {
-			withSonarQubeEnv(credentialsId: SonarCredential, installationName: SonarInstallationName) { 
-				sh 'mvn clean package sonar:sonar -Dsonar.host.url=http://23.100.47.167:9000 -Dsonar.sources=. -Dsonar.tests=. -Dsonar.inclusions=**/test/java/servlet/createpage_junit.java -Dsonar.test.exclusions=**/test/java/servlet/createpage_junit.java -Dsonar.login=admin -Dsonar.password=admin'
-			}
-			slackSend channel: SlackChannel, tokenCredentialId: SlackToken, message: "SonarQube Analysis Succeed ${env.JOB_NAME} ${env.BUILD_NUMBER} (<${env.BUILD_URL}|Open>)"
-		}
-	}
+//        stage('Code Analysis - SonarQube') {
+//		steps {
+//			withSonarQubeEnv(credentialsId: SonarCredential, installationName: SonarInstallationName) { 
+//				sh 'mvn clean package sonar:sonar -Dsonar.host.url=http://23.100.47.167:9000 -Dsonar.sources=. -Dsonar.tests=. -Dsonar.inclusions=**/test/java/servlet/createpage_junit.java -Dsonar.test.exclusions=**/test/java/servlet/createpage_junit.java -Dsonar.login=admin -Dsonar.password=admin'
+//			}
+//			slackSend channel: SlackChannel, tokenCredentialId: SlackToken, message: "SonarQube Analysis Succeed ${env.JOB_NAME} ${env.BUILD_NUMBER} (<${env.BUILD_URL}|Open>)"
+//		}
+//	}
 	stage('Build - Maven') {
 		steps {		
 			sh 'mvn clean install'
 			//ArtifactRun()
-			jiraSendBuildInfo branch: 'DD-3', site: JiraURL
+			jiraSendBuildInfo branch: JiraIssueKey, site: JiraURL
 			slackSend channel: SlackChannel, tokenCredentialId: SlackToken, message: "Build Success ${env.JOB_NAME} ${env.BUILD_NUMBER}"
 		}
  	} 
@@ -61,7 +62,7 @@ pipeline {
 			script {
 				deploy adapters: [tomcat8(credentialsId: TomcatCredential, path: '', url: TestDeployURL)], contextPath: '/QAWebapp', war: '**/*.war'	
 				slackSend channel: SlackChannel, tokenCredentialId: SlackToken, message: "Deployed to Test ${env.JOB_NAME} ${env.BUILD_NUMBER}"	
-				jiraComment body: "Deploy to Test was successfull ${env.JOB_NAME} ${env.BUILD_NUMBER}", issueKey: 'DD-3'				
+				jiraComment body: "Deploy to Test was successfull ${env.JOB_NAME} ${env.BUILD_NUMBER}", issueKey: JiraIssueKey				
 			}
 
 		}
@@ -139,7 +140,7 @@ pipeline {
 				steps{
 					deploy adapters: [tomcat8(credentialsId: TomcatCredential, path: '', url: TestDeployURL)], contextPath: '/ProdWebapp', war: '**/*.war'	
 					slackSend channel: SlackChannel, tokenCredentialId: SlackToken, message: "Deployed to Prod ${env.JOB_NAME} ${env.BUILD_NUMBER}"	    
-					jiraComment body: "Deploy to Prod was successfull ${env.JOB_NAME} ${env.BUILD_NUMBER}", issueKey: 'DD-3'
+					jiraComment body: "Deploy to Prod was successfull ${env.JOB_NAME} ${env.BUILD_NUMBER}", issueKey: JiraIssueKey
 				}
 				post {
 					always { 
