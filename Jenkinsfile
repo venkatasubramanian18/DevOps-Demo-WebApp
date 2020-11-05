@@ -1,7 +1,8 @@
 //Pipeline for full DEVOPS:
 pipeline {
     environment {
-	SONAR_CRED = credentials('sonaradmin')	    
+	SONAR_CRED = credentials('sonaradmin')	
+	GITHUB_CRED = credentials('GithubURL')	
 	registry = "devopstraining18/mavenbuild"
 	registryCredential = 'dockerhub'
 	dockerImage = ''
@@ -45,7 +46,7 @@ pipeline {
             steps {
                 // Get some code from a GitHub repository
 		sh 'docker container ls | grep "${registry}:*" | xargs -r docker stop' 
-                git credentialsId: GitHubLogin, url: GitHubURL	
+                git credentialsId: GitHubLogin, url: GITHUB_CRED_USR	
 		slackSend channel: SlackChannel, tokenCredentialId: SlackToken, message: "Pipeline build Started ${env.JOB_NAME} ${env.BUILD_NUMBER} (<${env.BUILD_URL}|Open>)"
             }
         }
