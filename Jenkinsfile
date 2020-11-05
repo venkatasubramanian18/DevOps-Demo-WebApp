@@ -132,7 +132,7 @@ pipeline {
 					stage('Cleanup server space') {
 						steps{
 							//sh "docker rmi $registry:$BUILD_NUMBER"
-							sh "docker rmi ${currentBuild.previousBuild.getNumber()}"
+							sh "docker rmi ${registry}${currentBuild.previousBuild.getNumber()}"
 						}
 					}	
 					stage('Docker Running') {
