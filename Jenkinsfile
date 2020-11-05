@@ -14,14 +14,14 @@ pipeline {
 	GitHubLogin = 'github'
 	SlackChannel = '#devops'
 	SlackToken = 'slacktoken'
-	JiraURL = ${JIRA_CRED_USR}
+	JiraURL = 'jira-devops18.atlassian.net'
 	JiraIssueKey = 'DD-3'
 	JiraSiteForTransition = 'jirasite'
 	SonarCredential = 'sonar'	
 	SonarInstallationName = 'sonarqube'
 	TomcatCredential = 'tomcat'
 	//TestDeployURL = 'http://23.101.207.158:8080/'	
-	TestDeployURL = ${TS_CRED_USR}
+	//TestDeployURL = ${TS_CRED_USR}
 	ProdDeployURL = 'http://51.141.177.121:8080/'
 	BlazemeterCredential = 'Blazemeter'
 	KubernetesCredential = "k8saccount"
@@ -66,14 +66,14 @@ pipeline {
 			sh 'mvn clean install'
 			//ArtifactRun()
 			jiraTransitionIssue idOrKey: JiraIssueKey, input: [ transition: [ id: 21] ], site: JiraSiteForTransition
-			jiraSendBuildInfo branch: JiraIssueKey, site: JiraURL			
+			jiraSendBuildInfo branch: JiraIssueKey, site: $JIRA_CRED_USR			
 			slackSend channel: SlackChannel, tokenCredentialId: SlackToken, message: "Build Success ${env.JOB_NAME} ${env.BUILD_NUMBER}"
 		}
  	} 
     	stage('Test Server Deploy') {
 		steps{
 			script {
-				deploy adapters: [tomcat8(credentialsId: TomcatCredential, path: '', url: TestDeployURL)], contextPath: '/QAWebapp', war: '**/*.war'	
+				deploy adapters: [tomcat8(credentialsId: TomcatCredential, path: '', url: $TS_CRED_USR)], contextPath: '/QAWebapp', war: '**/*.war'	
 				slackSend channel: SlackChannel, tokenCredentialId: SlackToken, message: "Deployed to Test ${env.JOB_NAME} ${env.BUILD_NUMBER}"	
 				jiraComment body: "Deploy to Test was successfull ${env.JOB_NAME} ${env.BUILD_NUMBER}", issueKey: JiraIssueKey				
 			}
