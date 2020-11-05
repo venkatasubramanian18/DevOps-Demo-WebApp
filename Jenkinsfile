@@ -126,7 +126,7 @@ pipeline {
 					}	
 					stage('Cleanup server space') {
 						steps{
-							sh "docker rmi $registry:$BUILD_NUMBER"
+							sh 'docker rm $(docker ps -a -q)'
 						}
 					}					
 					stage('Kubernetes Deploy') {
