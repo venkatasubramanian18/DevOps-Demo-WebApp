@@ -42,7 +42,7 @@ pipeline {
         stage('SCM - GIT Commit') {
             steps {
                 // Get some code from a GitHub repository
-		sh 'docker container ls | grep ${registry}":*"' | awk '{ print $1 }' | xargs -r docker stop'
+		    sh 'docker container ls | grep ${registry} "devopstraining18/mavenbuild:*"' | awk '{ print $1 }' | xargs -r docker stop'
                 git credentialsId: GitHubLogin, url: GitHubURL	
 		slackSend channel: SlackChannel, tokenCredentialId: SlackToken, message: "Pipeline build Started ${env.JOB_NAME} ${env.BUILD_NUMBER} (<${env.BUILD_URL}|Open>)"
             }
