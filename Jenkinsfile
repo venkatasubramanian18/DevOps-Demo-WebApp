@@ -136,7 +136,7 @@ pipeline {
 					}											
 					stage('Docker Running') {
 						steps{
-							sh 'docker run -d -p 8081:8080 -p 5432:5432 $DOCKER_REGISTRY_CRED_USR":$BUILD_NUMBER"'
+							sh 'docker run -d -p 8081:8080 -p 5432:5432 "$DOCKER_REGISTRY_CRED_USR:$BUILD_NUMBER"'
 						}
 					}						
 					stage('Kubernetes Deploy') {
