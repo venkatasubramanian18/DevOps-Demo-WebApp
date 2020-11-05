@@ -2,28 +2,25 @@
 pipeline {
     environment {
 	SONAR_CRED = credentials('sonaradmin')	
+ 	SONAR_URL_CRED = credentials('SonarURL')
 	GITHUB_CRED = credentials('GithubURL')	
 	JIRA_CRED = credentials('JiraURL')
 	TS_CRED = credentials('TestDeployURL')
-	//registry = "devopstraining18/mavenbuild"
+	PS_CRED = credentials('ProdDeployURL')
+	JFROG_CRED = credentials('JfrogURL')
 	DockerRegistry_CRED = credentials('DockerRegistry')
 	registryCredential = 'dockerhub'
 	dockerImage = ''
-	JfrogURL = 'https://devops111.jfrog.io/artifactory'	
 	JfrogLogin = 'artifactory'
 	rtServerID = 'artifactory'
 	GitHubLogin = 'github'
 	SlackChannel = '#devops'
 	SlackToken = 'slacktoken'
-	JiraURL = 'jira-devops18.atlassian.net'
 	JiraIssueKey = 'DD-3'
 	JiraSiteForTransition = 'jirasite'
 	SonarCredential = 'sonar'	
 	SonarInstallationName = 'sonarqube'
 	TomcatCredential = 'tomcat'
-	//TestDeployURL = 'http://23.101.207.158:8080/'	
-	//TestDeployURL = ${TS_CRED_USR}
-	ProdDeployURL = 'http://51.141.177.121:8080/'
 	BlazemeterCredential = 'Blazemeter'
 	KubernetesCredential = "k8saccount"
 	KubernetesProjectID = 'devops-294021'
@@ -57,7 +54,7 @@ pipeline {
         stage('Code Analysis - SonarQube') {
 		steps {
 			withSonarQubeEnv(credentialsId: SonarCredential, installationName: SonarInstallationName) { 
-				sh 'mvn clean package sonar:sonar -Dsonar.host.url=http://23.100.47.167:9000 -Dsonar.sources=. -Dsonar.tests=. -Dsonar.inclusions=**/test/java/servlet/createpage_junit.java -Dsonar.test.exclusions=**/test/java/servlet/createpage_junit.java -Dsonar.login=$SONAR_CRED_USR -Dsonar.password=$SONAR_CRED_PSW'
+				sh 'mvn clean package sonar:sonar -Dsonar.host.url=$SONAR_URL_CRED_USR -Dsonar.sources=. -Dsonar.tests=. -Dsonar.inclusions=**/test/java/servlet/createpage_junit.java -Dsonar.test.exclusions=**/test/java/servlet/createpage_junit.java -Dsonar.login=$SONAR_CRED_USR -Dsonar.password=$SONAR_CRED_PSW'
 			}
 			slackSend channel: SlackChannel, tokenCredentialId: SlackToken, message: "SonarQube Analysis Succeed ${env.JOB_NAME} ${env.BUILD_NUMBER} (<${env.BUILD_URL}|Open>)"
 		}
@@ -82,7 +79,7 @@ pipeline {
 		}
 		post {
 			always { 
-			jiraSendDeploymentInfo environmentId: 'Test', environmentName: 'Test', serviceIds: [''], environmentType: 'testing', site: JiraURL, state: 'successful'
+			jiraSendDeploymentInfo environmentId: 'Test', environmentName: 'Test', serviceIds: [''], environmentType: 'testing', site: JIRA_CRED_USR, state: 'successful'
 			}
 		}
    	}
@@ -159,13 +156,13 @@ pipeline {
 			}
 			stage('Prod Server Deploy') {		
 				steps{
-					deploy adapters: [tomcat8(credentialsId: TomcatCredential, path: '', url: TestDeployURL)], contextPath: '/ProdWebapp', war: '**/*.war'	
+					deploy adapters: [tomcat8(credentialsId: TomcatCredential, path: '', url: PS_CRED_USR)], contextPath: '/ProdWebapp', war: '**/*.war'	
 					slackSend channel: SlackChannel, tokenCredentialId: SlackToken, message: "Deployed to Prod ${env.JOB_NAME} ${env.BUILD_NUMBER}"	    
 					jiraComment body: "Deploy to Prod was successfull ${env.JOB_NAME} ${env.BUILD_NUMBER}", issueKey: JiraIssueKey
 				}
 				post {
 					always { 
-						jiraSendDeploymentInfo environmentId: 'Prod', environmentName: 'Production', serviceIds: [''], environmentType: 'production', site: JiraURL, state: 'successful'
+						jiraSendDeploymentInfo environmentId: 'Prod', environmentName: 'Production', serviceIds: [''], environmentType: 'production', site: JIRA_CRED_USR, state: 'successful'
 						jiraTransitionIssue idOrKey: JiraIssueKey, input: [ transition: [ id: 31] ], site: JiraSiteForTransition
 					}
 				}
@@ -198,7 +195,7 @@ pipeline {
 void ArtifactConfig() {
                 rtServer (
                    id: rtServerID,
-                   url: JfrogURL,
+                   url: JFROG_CRED_USR,
                    credentialsId: JfrogLogin
                 )
 		rtMavenResolver (
