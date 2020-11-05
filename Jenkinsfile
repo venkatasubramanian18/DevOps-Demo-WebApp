@@ -43,14 +43,14 @@ pipeline {
         stage('SCM - GIT Commit') {
             steps {
                 // Get some code from a GitHub repository
-		sh 'docker -d container ls | grep "${registry}:*" | xargs -r docker stop'
+		echo currentBuild.previousBuild.result
                 git credentialsId: GitHubLogin, url: GitHubURL	
 		slackSend channel: SlackChannel, tokenCredentialId: SlackToken, message: "Pipeline build Started ${env.JOB_NAME} ${env.BUILD_NUMBER} (<${env.BUILD_URL}|Open>)"
             }
         }
 	stage('Docker PORT Clean') {
             steps {
-		sh 'docker -d container ls | grep "${registry}:*" | xargs -r docker stop'                
+		sh 'docker container ls | grep "${registry}:*" | xargs -r docker stop'                
             }		
 	}	    
 //        stage('Code Analysis - SonarQube') {
@@ -132,7 +132,7 @@ pipeline {
 					}	
 					stage('Cleanup server space') {
 						steps{
-							sh 'docker rm $(docker ps -a -q)'
+							sh "docker rmi $registry:$BUILD_NUMBER"
 						}
 					}	
 					stage('Docker Running') {
