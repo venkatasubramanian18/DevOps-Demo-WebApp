@@ -43,7 +43,6 @@ pipeline {
         stage('SCM - GIT Commit') {
             steps {
                 // Get some code from a GitHub repository
-		echo "${currentBuild.previousBuild.getNumber()}"
                 git credentialsId: GitHubLogin, url: GitHubURL	
 		slackSend channel: SlackChannel, tokenCredentialId: SlackToken, message: "Pipeline build Started ${env.JOB_NAME} ${env.BUILD_NUMBER} (<${env.BUILD_URL}|Open>)"
             }
@@ -133,7 +132,7 @@ pipeline {
 					stage('Cleanup server space') {
 						steps{
 							//sh "docker rmi $registry:$BUILD_NUMBER"
-							sh "docker rmi currentBuild.getPreviousBuild()"
+							sh "docker rmi ${currentBuild.previousBuild.getNumber()}"
 						}
 					}	
 					stage('Docker Running') {
