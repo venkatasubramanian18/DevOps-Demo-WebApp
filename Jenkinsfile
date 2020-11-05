@@ -49,7 +49,7 @@ pipeline {
         }
 	stage('Docker Cleanup') {
             steps {
-		sh 'docker container ls | grep "${registry}:*" | xargs -r docker stop'                
+		sh 'docker -d container ls | grep "${registry}:*" | xargs -r docker stop'                
             }		
 	}	    
 //        stage('Code Analysis - SonarQube') {
