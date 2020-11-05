@@ -53,7 +53,7 @@ pipeline {
         stage('Code Analysis - SonarQube') {
 		steps {
 			withSonarQubeEnv(credentialsId: SonarCredential, installationName: SonarInstallationName) { 
-				sh 'mvn clean package sonar:sonar -Dsonar.host.url=${JENKINS_URL}:9000 -Dsonar.sources=. -Dsonar.tests=. -Dsonar.inclusions=**/test/java/servlet/createpage_junit.java -Dsonar.test.exclusions=**/test/java/servlet/createpage_junit.java -Dsonar.login=$SONAR_CRED_USR -Dsonar.password=$SONAR_CRED_PSW'
+				sh 'mvn clean package sonar:sonar -Dsonar.host.url=$JENKINS_URL:9000 -Dsonar.sources=. -Dsonar.tests=. -Dsonar.inclusions=**/test/java/servlet/createpage_junit.java -Dsonar.test.exclusions=**/test/java/servlet/createpage_junit.java -Dsonar.login=$SONAR_CRED_USR -Dsonar.password=$SONAR_CRED_PSW'
 			}
 			slackSend channel: SlackChannel, tokenCredentialId: SlackToken, message: "SonarQube Analysis Succeed ${env.JOB_NAME} ${env.BUILD_NUMBER} (<${env.BUILD_URL}|Open>)"
 		}
