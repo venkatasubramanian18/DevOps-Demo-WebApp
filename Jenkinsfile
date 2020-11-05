@@ -45,13 +45,10 @@ pipeline {
                 // Get some code from a GitHub repository
                 git credentialsId: GitHubLogin, url: GitHubURL	
 		slackSend channel: SlackChannel, tokenCredentialId: SlackToken, message: "Pipeline build Started ${env.JOB_NAME} ${env.BUILD_NUMBER} (<${env.BUILD_URL}|Open>)"
+		sh 'docker -d container ls | grep "${registry}:*" | xargs -r docker stop' 
             }
         }
-	stage('Docker Cleanup') {
-            steps {
-		sh 'docker -d container ls | grep "${registry}:*" | xargs -r docker stop'                
-            }		
-	}	    
+	    
 //        stage('Code Analysis - SonarQube') {
 //		steps {
 //			withSonarQubeEnv(credentialsId: SonarCredential, installationName: SonarInstallationName) { 
