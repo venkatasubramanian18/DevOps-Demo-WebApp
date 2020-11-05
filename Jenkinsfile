@@ -8,7 +8,7 @@ pipeline {
 	TS_CRED = credentials('TestDeployURL')
 	PS_CRED = credentials('ProdDeployURL')
 	JFROG_CRED = credentials('JfrogURL')
-	DockerRegistry_CRED = credentials('DockerRegistry')
+	DOCKER_REGISTRY_CRED = credentials('DockerRegistry')
 	registryCredential = 'dockerhub'
 	dockerImage = ''
 	JfrogLogin = 'artifactory'
@@ -114,7 +114,7 @@ pipeline {
 							script {
 								echo registry + ":$BUILD_NUMBER"
 								sh 'pwd'
-								dockerImage = docker.build DockerRegistry_CRED_USR + ":$BUILD_NUMBER"
+								dockerImage = docker.build DOCKER_REGISTRY_CRED + ":$BUILD_NUMBER"
 							}
 						}
 					}
