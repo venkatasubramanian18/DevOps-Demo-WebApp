@@ -5,7 +5,8 @@ pipeline {
 	GITHUB_CRED = credentials('GithubURL')	
 	JIRA_CRED = credentials('JiraURL')
 	TS_CRED = credentials('TestDeployURL')
-	registry = "devopstraining18/mavenbuild"
+	//registry = "devopstraining18/mavenbuild"
+	DockerRegistry_CRED = credentials('DockerRegistry')
 	registryCredential = 'dockerhub'
 	dockerImage = ''
 	JfrogURL = 'https://devops111.jfrog.io/artifactory'	
@@ -116,7 +117,7 @@ pipeline {
 							script {
 								echo registry + ":$BUILD_NUMBER"
 								sh 'pwd'
-								dockerImage = docker.build registry + ":$BUILD_NUMBER"
+								dockerImage = docker.build $DockerRegistry_CRED_USR + ":$BUILD_NUMBER"
 							}
 						}
 					}
@@ -138,7 +139,7 @@ pipeline {
 					}											
 					stage('Docker Running') {
 						steps{
-							sh 'docker run -d -p 8081:8080 -p 5432:5432 ${registry}":$BUILD_NUMBER"'
+							sh 'docker run -d -p 8081:8080 -p 5432:5432 ${DockerRegistry_CRED_USR}":$BUILD_NUMBER"'
 						}
 					}						
 					stage('Kubernetes Deploy') {
