@@ -1,4 +1,4 @@
-FROM ajit5144/ubuntu-tcat-x2-1
+FROM tomcat:8-jre8
 
 RUN ls -ltr 
 RUN pwd 
