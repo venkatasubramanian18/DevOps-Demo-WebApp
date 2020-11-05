@@ -23,7 +23,7 @@ pipeline {
 	KubernetesCredential = "k8saccount"
 	KubernetesProjectID = 'devops-294021'
 	KubernetesClusterName = 'k8scluster'
-	KubernetesZone = "us-west2-a"
+	KubernetesZone = "us-central1-c"
     }	
 	
     agent any
