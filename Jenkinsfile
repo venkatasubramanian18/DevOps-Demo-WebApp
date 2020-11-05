@@ -14,14 +14,14 @@ pipeline {
 	GitHubLogin = 'github'
 	SlackChannel = '#devops'
 	SlackToken = 'slacktoken'
-	JiraURL = $JIRA_CRED_USR
+	JiraURL = ${JIRA_CRED_USR}
 	JiraIssueKey = 'DD-3'
 	JiraSiteForTransition = 'jirasite'
 	SonarCredential = 'sonar'	
 	SonarInstallationName = 'sonarqube'
 	TomcatCredential = 'tomcat'
 	//TestDeployURL = 'http://23.101.207.158:8080/'	
-	TestDeployURL = $TS_CRED_USR
+	TestDeployURL = ${TS_CRED_USR}
 	ProdDeployURL = 'http://51.141.177.121:8080/'
 	BlazemeterCredential = 'Blazemeter'
 	KubernetesCredential = "k8saccount"
