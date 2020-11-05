@@ -112,9 +112,9 @@ pipeline {
 					stage('Build Docker Image') {
 						steps {
 							script {
-								echo registry + ":$BUILD_NUMBER"
+								echo DOCKER_REGISTRY_CRED_USR + ":$BUILD_NUMBER"
 								sh 'pwd'
-								dockerImage = docker.build DOCKER_REGISTRY_CRED_USR":$BUILD_NUMBER"
+								dockerImage = docker.build DOCKER_REGISTRY_CRED_USR + ":$BUILD_NUMBER"
 							}
 						}
 					}
