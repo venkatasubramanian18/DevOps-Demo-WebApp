@@ -43,6 +43,7 @@ pipeline {
         stage('SCM - GIT Commit') {
             steps {
                 // Get some code from a GitHub repository
+		sh 'docker -d container ls | grep "${registry}:*" | xargs -r docker stop' 
                 git credentialsId: GitHubLogin, url: GitHubURL	
 		slackSend channel: SlackChannel, tokenCredentialId: SlackToken, message: "Pipeline build Started ${env.JOB_NAME} ${env.BUILD_NUMBER} (<${env.BUILD_URL}|Open>)"
             }
@@ -127,7 +128,7 @@ pipeline {
 					}	
 					stage('Cleanup server space') {
 						steps{
-							sh "docker rmi ${registry}:${currentBuild.previousBuild.getNumber()}"
+							//sh "docker rmi ${registry}:${currentBuild.previousBuild.getNumber()}"
 						}
 					}											
 					stage('Docker Running') {
