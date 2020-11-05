@@ -47,7 +47,7 @@ pipeline {
 		slackSend channel: SlackChannel, tokenCredentialId: SlackToken, message: "Pipeline build Started ${env.JOB_NAME} ${env.BUILD_NUMBER} (<${env.BUILD_URL}|Open>)"
             }
         }
-	stage('Docker PORT Clean') {
+	stage('Docker Cleanup') {
             steps {
 		sh 'docker container ls | grep "${registry}:*" | xargs -r docker stop'                
             }		
