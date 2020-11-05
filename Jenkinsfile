@@ -45,7 +45,7 @@ pipeline {
         stage('SCM - GIT Commit') {
             steps {
                 // Get some code from a GitHub repository
-		sh 'docker container ls | grep "${DockerRegistry_CRED_USR}:*" | xargs -r docker stop' 
+		sh 'docker container ls | grep "$DockerRegistry_CRED_USR:*" | xargs -r docker stop' 
                 git credentialsId: GitHubLogin, url: GITHUB_CRED_USR	
 		slackSend channel: SlackChannel, tokenCredentialId: SlackToken, message: "Pipeline build Started ${env.JOB_NAME} ${env.BUILD_NUMBER} (<${env.BUILD_URL}|Open>)"
             }
