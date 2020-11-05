@@ -45,7 +45,6 @@ pipeline {
                 // Get some code from a GitHub repository
                 git credentialsId: GitHubLogin, url: GitHubURL	
 		slackSend channel: SlackChannel, tokenCredentialId: SlackToken, message: "Pipeline build Started ${env.JOB_NAME} ${env.BUILD_NUMBER} (<${env.BUILD_URL}|Open>)"
-		sh 'docker -d container ls | grep "${registry}:*" | xargs -r docker stop' 
             }
         }
 	    
@@ -125,12 +124,7 @@ pipeline {
 							}
 							slackSend channel: SlackChannel, tokenCredentialId: SlackToken, message: "Docker Image Push Success ${env.JOB_NAME} ${env.BUILD_NUMBER}"
 						}
-					}	
-					stage('Cleanup server space') {
-						steps{
-							sh "docker rmi ${registry}:${currentBuild.previousBuild.getNumber()}"
-						}
-					}	
+					}		
 					stage('Docker Running') {
 						steps{
 							sh 'docker run -d -p 8081:8080 -p 5432:5432 ${registry}":$BUILD_NUMBER"'
