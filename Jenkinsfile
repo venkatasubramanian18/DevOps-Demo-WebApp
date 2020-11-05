@@ -117,7 +117,7 @@ pipeline {
 							script {
 								echo registry + ":$BUILD_NUMBER"
 								sh 'pwd'
-								dockerImage = docker.build $DockerRegistry_CRED_USR + ":$BUILD_NUMBER"
+								dockerImage = docker.build DockerRegistry_CRED_USR + ":$BUILD_NUMBER"
 							}
 						}
 					}
