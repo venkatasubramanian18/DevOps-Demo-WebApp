@@ -110,7 +110,8 @@ pipeline {
 								echo registry + ":$BUILD_NUMBER"
 								sh 'pwd'
 								dockerImage = docker.build registry + ":$BUILD_NUMBER"
-							}							
+							}
+							sh 'docker run -p 8081:8080 -p 5432:5432 devopstraining18/mavenbuild:375'
 						}
 					}
 					stage('Push Docker Image') {
