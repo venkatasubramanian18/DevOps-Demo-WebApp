@@ -128,6 +128,7 @@ pipeline {
 					}	
 					stage('Cleanup server space') {
 						steps{
+							echo 'clean'
 							//sh "docker rmi ${registry}:${currentBuild.previousBuild.getNumber()}"
 						}
 					}											
