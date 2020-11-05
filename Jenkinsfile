@@ -48,7 +48,7 @@ pipeline {
         stage('SCM - GIT Commit') {
             steps {
                 // Get some code from a GitHub repository
-		sh 'docker container ls | grep "${registry}:*" | xargs -r docker stop' 
+		sh 'docker container ls | grep "${DockerRegistry_CRED_USR}:*" | xargs -r docker stop' 
                 git credentialsId: GitHubLogin, url: GITHUB_CRED_USR	
 		slackSend channel: SlackChannel, tokenCredentialId: SlackToken, message: "Pipeline build Started ${env.JOB_NAME} ${env.BUILD_NUMBER} (<${env.BUILD_URL}|Open>)"
             }
@@ -67,14 +67,14 @@ pipeline {
 			sh 'mvn clean install'
 			//ArtifactRun()
 			jiraTransitionIssue idOrKey: JiraIssueKey, input: [ transition: [ id: 21] ], site: JiraSiteForTransition
-			jiraSendBuildInfo branch: JiraIssueKey, site: ${JIRA_CRED_USR}			
+			jiraSendBuildInfo branch: JiraIssueKey, site: JIRA_CRED_USR		
 			slackSend channel: SlackChannel, tokenCredentialId: SlackToken, message: "Build Success ${env.JOB_NAME} ${env.BUILD_NUMBER}"
 		}
  	} 
     	stage('Test Server Deploy') {
 		steps{
 			script {
-				deploy adapters: [tomcat8(credentialsId: TomcatCredential, path: '', url: $TS_CRED_USR)], contextPath: '/QAWebapp', war: '**/*.war'	
+				deploy adapters: [tomcat8(credentialsId: TomcatCredential, path: '', url: TS_CRED_USR)], contextPath: '/QAWebapp', war: '**/*.war'	
 				slackSend channel: SlackChannel, tokenCredentialId: SlackToken, message: "Deployed to Test ${env.JOB_NAME} ${env.BUILD_NUMBER}"	
 				jiraComment body: "Deploy to Test was successfull ${env.JOB_NAME} ${env.BUILD_NUMBER}", issueKey: JiraIssueKey				
 			}
