@@ -38,7 +38,8 @@ pipeline {
 //			echo 'Artifact config'
 //			ArtifactConfig()	
 //		}
-//	}			
+//	}
+	    
         stage('SCM - GIT Commit') {
             steps {
                 // Get some code from a GitHub repository
@@ -47,6 +48,11 @@ pipeline {
 		slackSend channel: SlackChannel, tokenCredentialId: SlackToken, message: "Pipeline build Started ${env.JOB_NAME} ${env.BUILD_NUMBER} (<${env.BUILD_URL}|Open>)"
             }
         }
+	stage('Docker PORT Clean') {
+            steps {
+		sh 'docker -d container ls | grep "${registry}:*" | xargs -r docker stop'                
+            }		
+	}	    
 //        stage('Code Analysis - SonarQube') {
 //		steps {
 //			withSonarQubeEnv(credentialsId: SonarCredential, installationName: SonarInstallationName) { 
