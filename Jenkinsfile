@@ -118,7 +118,6 @@ pipeline {
 								sh 'pwd'
 								dockerImage = docker.build registry + ":$BUILD_NUMBER"
 							}
-							sh 'docker run -d -p 8081:8080 -p 5432:5432 ${registry}":$BUILD_NUMBER"'
 						}
 					}
 					stage('Push Docker Image') {
@@ -135,7 +134,12 @@ pipeline {
 						steps{
 							sh 'docker rm $(docker ps -a -q)'
 						}
-					}					
+					}	
+					stage('Docker Running') {
+						steps{
+							sh 'docker run -d -p 8081:8080 -p 5432:5432 ${registry}":$BUILD_NUMBER"'
+						}
+					}						
 					stage('Kubernetes Deploy') {
 						steps{
 							sh 'pwd'	
