@@ -98,12 +98,12 @@ pipeline {
 		}
 	}
 	    
- 	stage('Performance Test - Blazemeter') {
-		steps{
-	   		blazeMeterTest credentialsId: BlazemeterCredential, testId: '8626535.taurus', workspaceId: '677291'
-	    		slackSend channel: SlackChannel, tokenCredentialId: SlackToken, message: "Performance Test - Blazemeter ${env.JOB_NAME} ${env.BUILD_NUMBER}"
-		}
-	}	  
+// 	stage('Performance Test - Blazemeter') {
+//		steps{
+//	   		blazeMeterTest credentialsId: BlazemeterCredential, testId: '8626535.taurus', workspaceId: '677291'
+//	    		slackSend channel: SlackChannel, tokenCredentialId: SlackToken, message: "Performance Test - Blazemeter ${env.JOB_NAME} ${env.BUILD_NUMBER}"
+//		}
+//	}	  
 
 	stage('Deploy to Production') {
 		parallel{
